@@ -1,0 +1,87 @@
+# XBMC Media Center language file
+# Addon Name: Funimation
+# Addon id: plugin.video.funimation
+# Addon Provider: Aaron Frase (afrase91@gmail.com)
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+
+# plugin name
+msgctxt "#30000"
+msgid "Funimation"
+msgstr ""
+
+# root menu
+msgctxt "#30001"
+msgid "Shows"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Episodes"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Trailers"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Clips"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Clear Cache"
+msgstr ""
+
+
+
+# settings menu
+msgctxt "#30100"
+msgid "Add-on Settings"
+msgstr ""
+
+msgctxt "#30101"
+msgid "General"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Username"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Password"
+msgstr ""
+
+
+# error messages
+msgctxt "#30200"
+msgid "Unable to get the list of shows"
+msgstr ""
+
+msgctxt "#30201"
+msgid "Unable to get the list of episodes"
+msgstr ""
+
+
+# notifications
+msgctxt "#30300"
+msgid "Cache has been cleared"
+msgstr ""
