@@ -13,6 +13,8 @@ class UserController(object):
         self.__user_cache__ = utils.get_user_cache()
         self.__sessionid_cache__ = utils.get_sessionid_cache()
 
+        self.__user__ = None
+
         # no username or password was set. just get a session id
         if username and password:
             # either never logged in or cache cleared/expired
@@ -23,17 +25,19 @@ class UserController(object):
                 self.log('User not cached, trying to login')
                 self.__login__(username, password)
             else:
+                self.__user__ = User(self.__user_cache__)
                 # we have a cached login. check if the cache match's the current username
-                if username != self.__user_cache__['name']:
+                if username != self.__user__.name:
                     self.__login__(username, password)
                 else:
                     # we have cookies cached, set the cookie jar to the cached cookies
                     self.__req__.update_cookie_jar(self.__cookie_cache__)
-                    self.__user__ = User(self.__user_cache__)
         else:
             self.log('No login info, using anonymous')
             self.__get_session_id__()
-        self.log('Logged in as %s' % self.__user__.name)
+
+        if self.__user__:
+            self.log('Logged in as %s' % self.__user__.name)
 
     def __get_session_id__(self, new=False):
         if not new:
