@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+  <!-- Plugin name -->
+  <string id="30000">Funimation</string>
+  <string id="30001">Shows</string>
+  <string id="30002">Episodes</string>
+  <string id="30003">Movies</string>
+  <string id="30004">Trailers</string>
+  <string id="30005">Clips</string>
+  <string id="30006">Search</string>
+
+  <string id="30300">Cache has been cleared</string>
+
+  <string id="30100">Add-on Settings</string>
+  <string id="30101">General</string>
+  <string id="30102">Username</string>
+  <string id="30103">Password</string>
+  <string id="30007">Clear Cache</string>
+</strings>

@@ -80,6 +80,10 @@ msgctxt "#30201"
 msgid "Unable to get the list of episodes"
 msgstr ""
 
+msgctxt "#30202"
+msgid "Login failed, username or password incorrect"
+msgstr ""
+
 
 # notifications
 msgctxt "#30300"

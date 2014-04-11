@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.funimation" name="Funimation" version="0.1"
-       provider-name="Aaron Frase">
+<addon id="plugin.video.funimation" name="Funimation" version="0.0.2" provider-name="Aaron Frase">
   <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="xbmc.python" version="2.14.0"/>
     <import addon="script.module.xbmcswift2" version="2.4.0"/>
-    <import addon="script.module.requests" version="1.1.0"/>
+    <import addon="script.module.requests2" version="1.1.0"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
@@ -12,6 +11,8 @@
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <website>http://www.funimation.com</website>
+    <source>https://github.com/Sinap/plugin.video.funimation</source>
+    <email>afrase91@gmail.com</email>
     <language>en</language>
     <summary>Stream videos from funimation.com</summary>
     <description>Stream videos from funimation.com</description>
