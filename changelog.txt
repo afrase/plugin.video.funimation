@@ -1,0 +1,9 @@
+v0.0.3
+- Rewrote the plugin to not use xbmcswift2
+
+v0.0.2
+- Created a model/controller sort of architecture.
+- Added controls for caching.
+
+v0.0.1
+- Initial version

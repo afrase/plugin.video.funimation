@@ -119,3 +119,5 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
+upload.sh
