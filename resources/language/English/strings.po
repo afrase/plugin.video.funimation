@@ -16,76 +16,100 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-
-# plugin name
-msgctxt "#30000"
-msgid "Funimation"
-msgstr ""
-
-# root menu
-msgctxt "#30001"
+# menu strings
+msgctxt "#30010"
 msgid "Shows"
 msgstr ""
 
-msgctxt "#30002"
-msgid "Episodes"
-msgstr ""
-
-msgctxt "#30003"
-msgid "Movies"
-msgstr ""
-
-msgctxt "#30004"
-msgid "Trailers"
-msgstr ""
-
-msgctxt "#30005"
-msgid "Clips"
-msgstr ""
-
-msgctxt "#30006"
+msgctxt "#30011"
 msgid "Search"
 msgstr ""
 
-msgctxt "#30007"
-msgid "Clear Cache"
+msgctxt "#30012"
+msgid "Episodes"
 msgstr ""
 
-
-
-# settings menu
-msgctxt "#30100"
-msgid "Add-on Settings"
+msgctxt "#30013"
+msgid "Movies"
 msgstr ""
 
-msgctxt "#30101"
+msgctxt "#30014"
+msgid "Trailers"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Clips"
+msgstr ""
+
+msgctxt "#30016"
+msgid "More results"
+msgstr ""
+
+# general settings strings
+msgctxt "#30200"
 msgid "General"
 msgstr ""
 
-msgctxt "#30102"
+msgctxt "#30201"
 msgid "Username"
 msgstr ""
 
-msgctxt "#30103"
+msgctxt "#30202"
 msgid "Password"
 msgstr ""
 
-
-# error messages
-msgctxt "#30200"
-msgid "Unable to get the list of shows"
+msgctxt "#30203"
+msgid "Sub or Dub"
 msgstr ""
 
-msgctxt "#30201"
-msgid "Unable to get the list of episodes"
+msgctxt "#30204"
+msgid "Both"
 msgstr ""
 
-msgctxt "#30202"
-msgid "Login failed, username or password incorrect"
+msgctxt "#30205"
+msgid "Sub"
 msgstr ""
 
+msgctxt "#30206"
+msgid "Dub"
+msgstr ""
 
-# notifications
-msgctxt "#30300"
-msgid "Cache has been cleared"
+# advanced settings strings
+msgctxt "#30210"
+msgid "Advanced"
+msgstr ""
+
+msgctxt "#30211"
+msgid "Debug"
+msgstr ""
+
+msgctxt "#30212"
+msgid "View mode"
+msgstr ""
+
+msgctxt "#30213"
+msgid "XBMC Default"
+msgstr ""
+
+msgctxt "#30214"
+msgid "Thumbnails Everywhere"
+msgstr ""
+
+msgctxt "#30215"
+msgid "Video Thumbnails"
+msgstr ""
+
+msgctxt "#30216"
+msgid "Notification Length"
+msgstr ""
+
+#
+
+# messages
+msgctxt "#30600"
+msgid "Error"
+msgstr ""
+
+msgctxt "#30601"
+msgid "Unknown Error"
 msgstr ""

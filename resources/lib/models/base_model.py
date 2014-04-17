@@ -1,11 +1,14 @@
-from resources.lib.utils import Utils
+import sys
 
 
 class BaseModel(object):
     def __init__(self, json):
-        self.plugin = Utils().get_plugin()
-        self.log = Utils().get_log
+        self.plugin = sys.modules['__main__'].plugin
+        self.common = sys.modules['__main__'].common
+
         self.json = json
-        self.title = json['title']
-        self.nid = json['nid']
-        self.show_thumbnail = json['show thumbnail']
+
+        get = self.json.get
+        self.title = get('title')
+        self.nid = get('nid')
+        self.show_thumbnail = get('show thumbnail')

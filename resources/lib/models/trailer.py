@@ -1,6 +1,6 @@
-from resources.lib.models import base_video
+from resources.lib.models.base_video import BaseVideo
 
 
-class Trailer(base_video.BaseVideo):
+class Trailer(BaseVideo):
     def __init__(self, json):
         super(Trailer, self).__init__(json)

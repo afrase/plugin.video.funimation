@@ -1,44 +1,61 @@
-import requests
+import cookielib
+import json
+import os
+import sys
+import urllib
+import urllib2
+import xbmcvfs
 
 
-class HttpClient(object):
-    # __instance__ = None
-    __req__ = None
-
+class HTTPClient(object):
     def __init__(self):
-        if not self.__req__:
-            self.__req__ = requests.Session()
-            self.set_user_agent('FUNimation/858 CFNetwork/672.1.13 Darwin/14.0.0')
-            self.__base_url = self.set_base_url('http://www.funimation.com')
+        self.__xbmc__ = sys.modules['__main__'].xbmc
+        self.__plugin__ = sys.modules['__main__'].plugin
+        self.__settings__ = sys.modules['__main__'].settings
+        self.__common__ = sys.modules['__main__'].common
+        self.__log__ = self.__common__.log
 
-    # def __new__(cls, *args, **kwargs):
-    #     if not cls.__instance__:
-    #         cls.__instance__ = super(HttpClient, cls).__new__(cls, *args)
-    #     return cls.__instance__
+        cookie_path = self.__xbmc__.translatePath(self.__plugin__.getAddonInfo('profile'))
+        cookie_path = os.path.join(cookie_path, 'fun-cookiejar.txt')
+        self.__log__('Loading cookies from :' + repr(cookie_path), 5)
+        self.__cookiejar__ = cookielib.LWPCookieJar(cookie_path)
 
-    def set_user_agent(self, agent):
-        self.__req__.headers['User-Agent'] = agent
+        self.user = None
 
-    def set_base_url(self, url):
-        self.__base_url = url
+        if xbmcvfs.exists(cookie_path):
+            try:
+                self.__cookiejar__.load()
+            except cookielib.LoadError:
+                pass
+        else:
+            self.__cookiejar__.save()
+
+        cookie_handler = urllib2.HTTPCookieProcessor(self.__cookiejar__)
+        self.__opener__ = urllib2.build_opener(cookie_handler)
+
+        self.urls = {
+            'connect': 'http://www.funimation.com/phunware/system/connect.json',
+            'login': 'http://www.funimation.com/phunware/user/login.json',
+        }
+
+    def get(self, url):
+        url = self.__url__(url)
+        resp = self.__opener__.open(url)
+        return json.loads(''.join(resp.readlines())), resp.code
+
+    def post(self, url, data=None):
+        data = [] if data is None else urllib.urlencode(data)
+        resp = self.__opener__.open(self.__url__(url), data)
+        return json.loads(''.join(resp.readlines())), resp.code
+
+    def get_cookies_str(self):
+        return self.__cookiejar__.as_lwp_str()
+
+    def save(self):
+        self.__cookiejar__.save()
+
+    def __url__(self, url):
+        if url.startswith('/'):
+            url = 'http://www.funimation.com' + url
+        self.__log__(url, 5)
         return url
-
-    def get(self, url, **kwargs):
-        if url.startswith('/'):
-            url = self.__url__(url)
-        kwargs.setdefault('allow_redirects', True)
-        return self.__req__.request('GET', url, **kwargs)
-
-    def post(self, url, data=None, **kwargs):
-        if url.startswith('/'):
-            url = self.__url__(url)
-        return self.__req__.request('POST', url, data=data, **kwargs)
-
-    def get_cookie_dict(self):
-        return self.__req__.cookies.get_dict()
-
-    def update_cookie_jar(self, c_dict):
-        self.__req__.cookies.update(c_dict)
-
-    def __url__(self, path):
-        return self.__base_url + path

@@ -1,7 +1,7 @@
-from resources.lib.models import base_video
+from resources.lib.models.base_video import BaseVideo
 
 
-class Clip(base_video.BaseVideo):
+class Clip(BaseVideo):
     def __init__(self, json):
         super(Clip, self).__init__(json)
         self.rating = json['rating']

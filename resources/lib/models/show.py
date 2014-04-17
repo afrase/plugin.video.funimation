@@ -1,16 +1,18 @@
-from resources.lib.models import base_model
+from resources.lib.models.base_video import BaseModel
 
 
-class Show(base_model.BaseModel):
+class Show(BaseModel):
     def __init__(self, json):
         super(Show, self).__init__(json)
-        self.maturity = json['maturity rating']
-        self.post_date = json['post date']
-        self.genres = json['all terms'].split(', ')
-        self.votes = json['votes']
-        self.mobile_banner_large = json['mobile_banner_large']
-        self.similar_shows = json['similar_shows'].split(',')
-        self.video_section = json['Video section']
+        get = self.json.get
+
+        self.maturity = get('maturity rating')
+        self.post_date = get('post date')
+        self.genres = get('all terms', '').split(', ')
+        self.votes = get('votes')
+        self.mobile_banner_large = get('mobile_banner_large')
+        self.similar_shows = get('similar_shows', '').split(',')
+        self.video_section = get('Video section')
 
     def has_episodes(self):
         return self.__has_video_type__('Episodes')
@@ -24,13 +26,17 @@ class Show(base_model.BaseModel):
     def has_trailers(self):
         return self.__has_video_type__('Trailers')
 
-    def itemize(self):
-        return {
-            'label': self.title,
+    def itemize(self, video_type=None):
+        item = {
+            'Title': self.title,
             'icon': self.show_thumbnail,
             'thumbnail': self.mobile_banner_large,
-            'path': self.plugin.url_for('episodes_list', show_id=self.nid)
+            'path': '/root/shows',
+            'show': self.nid,
         }
+        if video_type:
+            item['type'] = video_type
+        return item
 
     def __has_video_type__(self, v_type):
         if isinstance(self.video_section, dict):
