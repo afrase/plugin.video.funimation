@@ -88,9 +88,13 @@ class Utils(object):
             self.common.log('String is missing: %s' % string_id)
             return string_id
 
-    def stream_url(self, video_id):
+    def stream_url(self, video_id, hd=False):
         # TODO: figure out the max quality
-        quality = '2000'
+        if hd:
+            quality = '3500'
+        else:
+            quality = '2000'
+
         base_url = 'http://wpc.8c48.edgecastcdn.net'
         uid = '9b303b6c62204a9dcb5ce5f5c607'
         url = '%s/038C48/SV/480/%s/%s-480-%sK.mp4.m3u8?%s' % (

@@ -179,7 +179,7 @@ class Navigation(object):
         icon = self.utils.get_thumbnail(icon)
         list_item = self.xbmcgui.ListItem(item('Title'), iconImage=icon, thumbnailImage=item('thumbnail'))
         # url = '%s?path=%s&action=play_video&videoid=%s' % (sys.argv[0], '/root/video', item('videoid'))
-        url = self.utils.stream_url(item('videoid'))
+        url = self.utils.stream_url(item('videoid'), item('hd'))
 
         list_item.setProperty('Video', 'true')
         list_item.setProperty('IsPlayable', 'true')

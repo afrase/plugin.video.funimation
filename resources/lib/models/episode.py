@@ -9,6 +9,12 @@ class Episode(BaseVideo):
         self.episode_thumbnail = get('episode thumbnail')
         self.language = get('language')
         self.sub_dub = get('sub-dub')
+        self.quality = get('video quality')
+        self.hd = False
+        if len(self.quality) > 0:
+            for i in self.quality.items():
+                if 'HD' in i[1]:
+                    self.hd = True
 
     def itemize(self):
         return {
@@ -19,7 +25,8 @@ class Episode(BaseVideo):
                 'Duration': self.duration
             },
             'videoid': self.funimation_id,
-            'is_playable': True
+            'is_playable': True,
+            'hd': self.hd
         }
 
     def _stream_url(self):
