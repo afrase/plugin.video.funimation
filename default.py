@@ -7,6 +7,7 @@ import xbmcaddon
 import StorageServer
 import CommonFunctions
 
+from resources.lib.controllers.user_controller import UserController
 from resources.lib.navigation import Navigation
 from resources.lib.utils import Utils
 from resources.lib.settings import Settings
@@ -38,6 +39,7 @@ if __name__ == '__main__':
 
     settings = Settings()
     utils = Utils()
+    user = UserController()
     navigation = Navigation()
 
     if not sys.argv[2]:
