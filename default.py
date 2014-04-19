@@ -35,7 +35,6 @@ if __name__ == '__main__':
         common.log(addon_name)
 
     utils = Utils()
-    user = UserController()
     navigation = Navigation()
 
     if not sys.argv[2]:
@@ -48,6 +47,7 @@ if __name__ == '__main__':
         elif params.get('path'):
             navigation.list_menu(params)
         elif params.get('fetch_login'):
+            user = UserController()
             user.login()
         else:
             common.log('ARGV Nothing done.. verify params ' + repr(params))

@@ -4,13 +4,14 @@ from resources.lib.controllers.episodes_controller import EpisodesController
 from resources.lib.controllers.movies_controller import MoviesController
 from resources.lib.controllers.shows_controller import ShowsController
 from resources.lib.controllers.trailers_controller import TrailersController
+from resources.lib.controllers.user_controller import UserController
 from resources.lib.http_client import HTTPClient
 
 
 class Api():
     def __init__(self):
         self.http = HTTPClient()
-        self.user = sys.modules['__main__'].user
+        self.user = UserController()
         self.common = sys.modules['__main__'].common
         self.cache = sys.modules['__main__'].cache
 
