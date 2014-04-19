@@ -11,7 +11,6 @@ class HTTPClient(object):
     def __init__(self):
         self.__xbmc__ = sys.modules['__main__'].xbmc
         self.__plugin__ = sys.modules['__main__'].plugin
-        self.__settings__ = sys.modules['__main__'].settings
         self.__common__ = sys.modules['__main__'].common
         self.__log__ = self.__common__.log
 
@@ -40,13 +39,12 @@ class HTTPClient(object):
 
     def get(self, url):
         url = self.__url__(url)
-        resp = self.__opener__.open(url)
-        return json.loads(''.join(resp.readlines())), resp.code
+        return json.loads(''.join(self.__opener__.open(url).readlines()))
 
     def post(self, url, data=None):
         data = [] if data is None else urllib.urlencode(data)
         resp = self.__opener__.open(self.__url__(url), data)
-        return json.loads(''.join(resp.readlines())), resp.code
+        return json.loads(''.join(resp.readlines()))
 
     def get_cookies_str(self):
         return self.__cookiejar__.as_lwp_str()

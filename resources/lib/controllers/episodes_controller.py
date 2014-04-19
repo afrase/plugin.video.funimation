@@ -9,24 +9,21 @@ class EpisodesController(BaseController):
         self.show_id = show_id
         self.page = int(page)
         self.json = node
-        self.episodes = []
-        if self.json['nodes'] > 0:
-            for attr in self.json['nodes']:
-                self.common.log(attr, 10)
-                self.episodes.append(Episode(attr['show']))
+
+        if isinstance(self.json, dict):
+            if self.json['nodes'] > 0:
+                for attr in self.json['nodes']:
+                    self._common.log(attr, 9)
+                    self._items.append(Episode(attr['show']))
 
     def itemize(self):
-        sb = int(self.plugin.getSetting('sub_dub'))
+        sb = int(self._plugin.getSetting('sub_dub'))
         if sb == 1:
-            self.common.log('getting subs')
-            return [ep.itemize() for ep in self.episodes if ep.sub()]
+            self._common.log('getting subs', 9)
+            return [ep.itemize() for ep in self if ep.sub()]
         elif sb == 2:
-            self.common.log('getting subs')
-            return [ep.itemize() for ep in self.episodes if ep.dub()]
+            self._common.log('getting subs', 9)
+            return [ep.itemize() for ep in self if ep.dub()]
         else:
-            self.common.log(sb)
-            return [ep.itemize() for ep in self.episodes]
-
-    def has_more(self):
-        # seems the api only returns 50 episodes at a time
-        return len(self.episodes) >= 50
+            self._common.log(sb, 9)
+            return [ep.itemize() for ep in self]

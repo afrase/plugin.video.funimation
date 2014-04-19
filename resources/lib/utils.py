@@ -9,9 +9,45 @@ STRINGS = {
     'trailers': 30014,
     'clips': 30015,
     'more_results': 30016,
+
+    # messages
     'error': 30600,
     'unknown_error': 30601,
+    'no_episodes': 30603,
+    'no_movies': 30604,
+    'no_trailers': 30605,
+    'no_clips': 30606,
 
+    # genres
+    'action': 30700,
+    'adventure': 30701,
+    'bishonen': 30702,
+    'bishoujo': 30703,
+    'comedy': 30704,
+    'cyberpunk': 30705,
+    'drama': 30706,
+    'fan_service': 30707,
+    'fantasy': 30708,
+    'harem': 30709,
+    'historical': 30710,
+    'horror': 30711,
+    'live_action': 30712,
+    'magical_girl': 30713,
+    'martial_arts': 30714,
+    'mecha': 30715,
+    'moe': 30716,
+    'mystery': 30717,
+    'reverse_harem': 30718,
+    'romance': 30719,
+    'school': 30720,
+    'scifi': 30721,
+    'shonen': 30722,
+    'slice_of_life': 30723,
+    'space': 30724,
+    'sports': 30725,
+    'super_power': 30726,
+    'supernatural': 30727,
+    'yuri': 30728,
 }
 
 
@@ -21,47 +57,40 @@ class Utils(object):
         self.plugin = sys.modules['__main__'].plugin
         self.language = sys.modules['__main__'].language
         self.common = sys.modules['__main__'].common
-        self.dbg = sys.modules['__main__'].dbg
-
-        self.thumbnail_path = os.path.join(self.plugin.getAddonInfo('path'), 'thumbnails')
 
     def get_thumbnail(self, title):
         if not title:
             title = 'DefaultFolder'
-
-        thumbnail = os.path.join(self.thumbnail_path, title + '.png')
+        thumbnail_path = os.path.join(self.plugin.getAddonInfo('path'), 'thumbnails')
+        thumbnail = os.path.join(thumbnail_path, title + '.png')
         if not os.path.isfile(thumbnail):
             thumbnail = 'DefaultFolder.png'
 
         return thumbnail
 
-    def show_message(self, heading, message):
-        self.common.log(repr(type(heading)) + " - " + repr(type(message)), 5)
+    def show_message(self, message, title=None, icon=None):
+        self.common.log(repr(title) + " - " + repr(message), 5)
         duration = ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10][int(self.plugin.getSetting('notification_length'))]) * 1000
-        self.xbmc.executebuiltin((u'XBMC.Notification("%s", "%s", %s)' % (heading, message, duration)).encode())
+        if not title:
+            title = self.plugin.getAddonInfo('name')
+        if not icon:
+            icon = self.plugin.getAddonInfo('icon')
+        self.xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (title, message, duration, icon))
 
     def show_error_message(self, result=None, title=None):
-        """
-        Shows an error message.
-
-        :param result: the content of the message. If none then and unknown_error message is displayed
-        :param title: the title of the message
-        :type result: str
-        :type title: str
-        """
         if not title:
             title = self.get_string('error')
 
         if result:
-            self.show_message(title, result)
+            self.show_message(result, title)
         else:
-            self.show_message(title, self.get_string('unknown_error'))
+            self.show_message(self.get_string('unknown_error'), title)
 
     def build_item_url(self, item_params=None, url=''):
         self.common.log('url: %s items: %s' % (repr(url), repr(item_params)), 9)
         if not item_params: item_params = {}
 
-        blacklist = ('path', 'thumbnail', 'icon', 'Title')
+        blacklist = ('path', 'thumbnail', 'icon', 'Title', 'Title2')
 
         for key, value in item_params.items():
             if key not in blacklist:
@@ -82,10 +111,10 @@ class Utils(object):
     def get_string(self, string_id):
         if string_id in STRINGS:
             string = self.language(STRINGS[string_id]).encode('utf-8')
-            self.common.log('%s translates to %s' % (STRINGS[string_id], string))
+            self.common.log('%s translates to %s' % (STRINGS[string_id], string), 5)
             return string
         else:
-            self.common.log('String is missing: %s' % string_id)
+            self.common.log('String is missing: %s' % string_id, 5)
             return string_id
 
     def stream_url(self, video_id, hd=False):
@@ -101,3 +130,12 @@ class Utils(object):
             base_url, video_id, video_id, quality, uid)
         self.common.log(url, 9)
         return url
+
+    @staticmethod
+    def to_minutes(t):
+        if len(t.split(':')) == 2:
+            m, s = [int(i) for i in t.split(':')]
+            return (60 * m + s) / 60
+        elif len(t.split(':')) == 3:
+            h, m, s = [int(i) for i in t.split(':')]
+            return (3600 * h + 60 * m + s) / 60

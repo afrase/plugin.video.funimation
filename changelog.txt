@@ -1,8 +1,19 @@
+v0.0.6
+- Added asynchronous login when the addon is run
+
+v0.0.5
+- Added movies, trailers, and clips
+
+v0.0.4
+- Implemented search
+- Implemented caching
+- Added setting to select which genres to show
+
 v0.0.3
 - Rewrote the plugin to not use xbmcswift2
 
 v0.0.2
-- Created a model/controller sort of architecture.
+- Created model/controllers
 - Added controls for caching.
 
 v0.0.1

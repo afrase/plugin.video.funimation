@@ -1,4 +1,5 @@
 import sys
+from resources.lib.controllers.clips_controller import ClipsController
 from resources.lib.controllers.episodes_controller import EpisodesController
 from resources.lib.controllers.movies_controller import MoviesController
 from resources.lib.controllers.shows_controller import ShowsController
@@ -11,6 +12,7 @@ class Api():
         self.http = HTTPClient()
         self.user = sys.modules['__main__'].user
         self.common = sys.modules['__main__'].common
+        self.cache = sys.modules['__main__'].cache
 
         self.sort_types = ['alpha', 'date', 'dvd', 'now', 'soon', 'votes', 'episode', 'title', 'sequence']
         self.order_types = ['asc', 'desc']
@@ -21,11 +23,25 @@ class Api():
             'shows': '/mobile/shows.json/%s/%s/nl/%s/%s',
             'episodes': '/mobile/episodes.json/%s/%s/%s/all/%s?page=%s',
             'movies': '/mobile/movies.json/%s/%s/%s/all/%s?page=%s',
-            'trailers': '/mobile/trailers.json/%s/%s/%s/%s/%s?page=%s',
-            'clips': '/mobile/clips.json/%s/%s/%s/%s/%s?page=%s',
+            'trailers': '/mobile/trailers.json/%s/%s/%s/all/all?page=%s',
+            'clips': '/mobile/clips.json/%s/%s/%s/all/all?page=%s',
+            'search': '/mobile/shows.json/alpha/asc/nl/all/all?keys=%s'
         }
 
+    def search_shows(self, term):
+        self.common.log('', 5)
+        url = self.urls['search'] % term
+
+        response = self.http.get(url)
+        self.common.log('Done', 5)
+        try:
+            return ShowsController(response)
+        except Exception, e:
+            self.common.log(e)
+            return None
+
     def get_shows(self, sort_by=None, order_by=None, rating=None, genre=None):
+        self.common.log('', 5)
         if not sort_by or self.sort_types not in sort_by:
             sort_by = 'alpha'
 
@@ -40,13 +56,17 @@ class Api():
 
         url = self.urls['shows'] % (sort_by, order_by, rating, genre)
 
-        response, status = self.http.get(url)
-        if status == 200:
-            return ShowsController(response), status
-        else:
-            return None, status
+        response = self.cache.cacheFunction(self.http.get, url)
+
+        self.common.log('Done', 5)
+        try:
+            return ShowsController(response)
+        except Exception, e:
+            self.common.log(e)
+            return None
 
     def get_episodes(self, show_id, page=0, sort_by=None, order_by=None):
+        self.common.log('', 5)
         if not sort_by or self.sort_types not in sort_by:
             sort_by = 'sequence'
 
@@ -61,14 +81,16 @@ class Api():
 
         url = self.urls['episodes'] % (video_type, sort_by, order_by, show_id, page)
 
-        response, status = self.http.get(url)
+        response = self.cache.cacheFunction(self.http.get, url)
 
-        if status == 200 and len(response) > 0:
-            return EpisodesController(response, show_id, page), status
-        else:
-            return None, status
+        try:
+            return EpisodesController(response, show_id, page)
+        except Exception, e:
+            self.common.log(e)
+            return None
 
     def get_movies(self, show_id, page=0, sort_by=None, order_by=None):
+        self.common.log('', 5)
         if not sort_by or self.sort_types not in sort_by:
             sort_by = 'sequence'
 
@@ -83,14 +105,17 @@ class Api():
 
         url = self.urls['movies'] % (video_type, sort_by, order_by, show_id, page)
 
-        response, status = self.http.get(url)
+        response = self.cache.cacheFunction(self.http.get, url)
 
-        if status == 200 and len(response) > 0:
-            return MoviesController(response, show_id, page), status
-        else:
-            return None, status
+        self.common.log('Done', 5)
+        try:
+            return MoviesController(response, show_id, page)
+        except Exception, e:
+            self.common.log(e)
+            return None
 
     def get_trailers(self, show_id, page=0, sort_by=None, order_by=None):
+        self.common.log('', 5)
         if not sort_by or self.sort_types not in sort_by:
             sort_by = 'date'
 
@@ -99,14 +124,16 @@ class Api():
 
         url = self.urls['trailers'] % (sort_by, order_by, show_id, page)
 
-        response, status = self.http.get(url)
-
-        if status == 200 and len(response) > 0:
-            return TrailersController(response, show_id, page), status
-        else:
-            return None, status
+        response = self.cache.cacheFunction(self.http.get, url)
+        self.common.log('Done', 5)
+        try:
+            return TrailersController(response, show_id, page)
+        except Exception, e:
+            self.common.log(e)
+            return None
 
     def get_clips(self, show_id, page=0, sort_by=None, order_by=None):
+        self.common.log('', 5)
         if not sort_by or self.sort_types not in sort_by:
             sort_by = 'date'
 
@@ -115,9 +142,11 @@ class Api():
 
         url = self.urls['clips'] % (sort_by, order_by, show_id, page)
 
-        response, status = self.http.get(url)
+        response = self.cache.cacheFunction(self.http.get, url)
 
-        if status == 200 and len(response) > 0:
-            return ClipsController(response, show_id, page), status
-        else:
-            return None, status
+        self.common.log('Done', 5)
+        try:
+            return ClipsController(response, show_id, page)
+        except Exception, e:
+            self.common.log(e)
+            return None

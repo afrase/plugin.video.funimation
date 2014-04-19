@@ -11,7 +11,7 @@ class Episode(BaseVideo):
         self.sub_dub = get('sub-dub')
         self.quality = get('video quality')
         self.hd = False
-        if len(self.quality) > 0:
+        if isinstance(self.quality, dict):
             for i in self.quality.items():
                 if 'HD' in i[1]:
                     self.hd = True
@@ -22,16 +22,11 @@ class Episode(BaseVideo):
             'icon': self.show_thumbnail,
             'thumbnail': self.episode_thumbnail,
             'info': {
-                'Duration': self.duration
+                'Duration': self.duration,
+                'episode': self.episode_number,
+                'votes': self.votes,
+                'mpaa': self.rating,
             },
             'videoid': self.funimation_id,
-            'is_playable': True,
             'hd': self.hd
         }
-
-    def _stream_url(self):
-        base_url = 'http://wpc.8c48.edgecastcdn.net'
-        uid = '9b303b6c62204a9dcb5ce5f5c607'
-        url = '%s/038C48/SV/480/%s/%s-480-2000K.mp4.m3u8?%s' % \
-              (base_url, self.funimation_id, self.funimation_id, uid)
-        return url
