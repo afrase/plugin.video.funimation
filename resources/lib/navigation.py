@@ -17,12 +17,12 @@ class Navigation(object):
         _ = self.utils.get_string
 
         self.categories = (
-            {'Title': _('shows'),       'path': '/root/shows',          'thumbnail': 'shows',    'folder': 'true', 'get': 'shows'},
-            {'Title': _('search'),      'path': '/root/search',         'thumbnail': 'search',   'folder': 'true', 'get': 'search'},
-            {'Title': _('episodes'),    'path': '/root/shows/episodes', 'thumbnail': 'shows',    'folder': 'true', 'type': 'episodes'},
-            {'Title': _('movies'),      'path': '/root/shows/movies',   'thumbnail': 'movies',   'folder': 'true', 'type': 'movies'},
-            {'Title': _('trailers'),    'path': '/root/shows/trailers', 'thumbnail': 'trailers', 'folder': 'true', 'type': 'trailers'},
-            {'Title': _('clips'),       'path': '/root/shows/clips',    'thumbnail': 'featured', 'folder': 'true', 'type': 'clips'},
+            {'Title': _('shows'),       'path': '/root/shows',          'folder': 'true', 'get': 'shows'},
+            {'Title': _('search'),      'path': '/root/search',         'folder': 'true', 'get': 'search'},
+            {'Title': _('episodes'),    'path': '/root/shows/episodes', 'folder': 'true', 'type': 'episodes'},
+            {'Title': _('movies'),      'path': '/root/shows/movies',   'folder': 'true', 'type': 'movies'},
+            {'Title': _('trailers'),    'path': '/root/shows/trailers', 'folder': 'true', 'type': 'trailers'},
+            {'Title': _('clips'),       'path': '/root/shows/clips',    'folder': 'true', 'type': 'clips'},
         )
 
     def list_menu(self, params=None):
