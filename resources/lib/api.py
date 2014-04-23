@@ -57,6 +57,8 @@ class Api():
 
         url = self.urls['shows'] % (sort_by, order_by, rating, genre)
 
+        self.user.login()
+
         response = self.cache.cacheFunction(self.http.get, url)
 
         self.common.log('Done', 5)
