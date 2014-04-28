@@ -115,6 +115,10 @@ msgctxt "#30219"
 msgid "Prefetch (WIP)"
 msgstr ""
 
+msgctxt "#30220"
+msgid "Blacklisted show IDs (comma separated)"
+msgstr ""
+
 # messages
 msgctxt "#30600"
 msgid "Error"

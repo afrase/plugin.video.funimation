@@ -15,7 +15,7 @@ class ShowsController(BaseController):
                     self._items.append(Show(attr['video']))
 
         # blacklist shows that have nothing to watch
-        self.show_blacklist = ['51579', '51580', '469', '51581', '51807', '51557', '1', '5']
+        self.show_blacklist = self._plugin.getSetting('black_list').split(',')
 
     def all(self, s_type):
         return [i.itemize(s_type) for i in self._items if self.allowed_genres(i.genres) and i.nid not in self.show_blacklist]

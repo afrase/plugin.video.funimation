@@ -11,14 +11,17 @@ from resources.lib.http_client import HTTPClient
 class Api():
     def __init__(self):
         self.http = HTTPClient()
-        self.user = UserController()
+        self.user = UserController(self.http)
         self.common = sys.modules['__main__'].common
         self.cache = sys.modules['__main__'].cache
 
         self.sort_types = ['alpha', 'date', 'dvd', 'now', 'soon', 'votes', 'episode', 'title', 'sequence']
         self.order_types = ['asc', 'desc']
         self.rating_type = ['tvpg', 'tv14', 'tvma', 'nr', 'pg', 'pg13', 'r', 'all']
-        self.genre_types = ['all', 'action', 'adventure', 'bishonen', 'bishoujo', 'comedy', 'cyberpunk', 'drama', 'fan_service', 'fantasy', 'harem', 'historical', 'horror', 'live_action', 'magical_girl', 'martial_arts', 'mecha', 'moe', 'mystery', 'reverse_harem', 'romance', 'school', 'scifi', 'shonen', 'slice_of_life', 'space', 'sports', 'super_power', 'supernatural', 'yuri']
+        self.genre_types = ['all', 'action', 'adventure', 'bishonen', 'bishoujo', 'comedy', 'cyberpunk', 'drama',
+                            'fan_service', 'fantasy', 'harem', 'historical', 'horror', 'live_action', 'magical_girl',
+                            'martial_arts', 'mecha', 'moe', 'mystery', 'reverse_harem', 'romance', 'school', 'scifi',
+                            'shonen', 'slice_of_life', 'space', 'sports', 'super_power', 'supernatural', 'yuri']
 
         self.urls = {
             'shows': '/mobile/shows.json/%s/%s/nl/%s/%s',

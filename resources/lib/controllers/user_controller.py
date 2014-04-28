@@ -4,10 +4,10 @@ from resources.lib.models.user import User
 
 
 class UserController(BaseController):
-    def __init__(self):
+    def __init__(self, http_client=None):
         super(UserController, self).__init__()
 
-        self.__http__ = HTTPClient()
+        self.__http__ = http_client if http_client else HTTPClient()
         self.cookie_expired = True
         self.logged_in = False
         self.user = None
