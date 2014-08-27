@@ -1,11 +1,15 @@
-from resources.lib.models.base_video import BaseVideo
+from .base_video import BaseVideo
 
 
 class Episode(BaseVideo):
+
     def __init__(self, json):
         super(Episode, self).__init__(json)
         get = self.json.get
-        self.episode_number = get('episode number').split('.')[0] if get('episode number') else ''
+        if get('episode number'):
+            self.episode_number = get('episode number').split('.')[0]
+        else:
+            self.episode_number = ''
         self.episode_thumbnail = get('episode thumbnail')
         self.language = get('language')
         self.sub_dub = get('sub-dub')

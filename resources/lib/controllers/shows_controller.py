@@ -1,8 +1,9 @@
-from resources.lib.controllers.base_controller import BaseController
+from .base_controller import BaseController
 from resources.lib.models.show import Show
 
 
 class ShowsController(BaseController):
+
     def __init__(self, node):
         super(ShowsController, self).__init__()
 
@@ -11,11 +12,11 @@ class ShowsController(BaseController):
         if isinstance(self.json, dict):
             if len(self.json['videos']) > 0:
                 for attr in self.json['videos']:
-                    self._common.log(attr, 9)
+                    self.log(attr, 9)
                     self._items.append(Show(attr['video']))
 
         # blacklist shows that have nothing to watch
-        self.show_blacklist = self._plugin.getSetting('black_list').split(',')
+        self.show_blacklist = self.settings.getSetting('black_list').split(',')
 
     def all(self, s_type):
         return [i.itemize(s_type) for i in self._items if self.allowed_genres(i.genres) and i.nid not in self.show_blacklist]
@@ -31,7 +32,7 @@ class ShowsController(BaseController):
 
     def allowed_genres(self, show_genres):
         for genre in show_genres:
-            if self._plugin.getSetting(genre) == 'false':
-                self._common.log('%s not allowed' % genre, 9)
+            if self.settings.getSetting(genre) == 'false':
+                self.log('%s not allowed' % genre, 9)
                 return False
         return True

@@ -1,8 +1,9 @@
-from resources.lib.controllers.base_controller import BaseController
+from .base_controller import BaseController
 from resources.lib.models.clip import Clip
 
 
 class ClipsController(BaseController):
+
     def __init__(self, node, show_id=None, page='0'):
         super(ClipsController, self).__init__()
         self.show_id = show_id
@@ -13,7 +14,7 @@ class ClipsController(BaseController):
             get = self.json.get
             if get('node') > 0:
                 for attr in get('node'):
-                    self._common.log(attr, 9)
+                    self.log(attr, 9)
                     self._items.append(Clip(attr['show']))
 
     def itemize(self):

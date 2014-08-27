@@ -1,12 +1,14 @@
-from resources.lib.models.base_video import BaseVideo
+from .base_video import BaseVideo
 
 
 class Clip(BaseVideo):
+
     def __init__(self, json):
         super(Clip, self).__init__(json)
         get = self.json.get
         self.show_thumbnail = get('show thumbnail')
-        self.genres = [i.lower().replace(' ', '_') for i in get('all terms', '').split(', ')]
+        self.genres = [i.lower().replace(' ', '_')
+                       for i in get('all terms', '').split(', ')]
         self.quality = get('video quality')
         self.hd = False
         if isinstance(self.quality, dict):

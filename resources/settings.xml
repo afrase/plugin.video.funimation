@@ -18,7 +18,6 @@
     <setting id="debug" type="bool" label="30211" default="true" />
     <setting type="sep" />
     <setting label="30218" type="action" action="RunScript($CWD/resources/lib/scripts/clear_cache.py)"/>
-    <setting label="30219" type="action" action="RunScript($CWD/prefetch.py)"/>
   </category>
 
   <!-- Genres -->

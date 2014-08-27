@@ -1,3 +1,4 @@
+import os
 import StorageServer
 import CommonFunctions
 import xbmc
@@ -16,4 +17,11 @@ common.dbglevel = 5
 
 common.log('clearing cache')
 cache = StorageServer.StorageServer(name).delete('%')
+
+cookie_path = xbmc.translatePath(addon.getAddonInfo('profile'))
+cookie_path = os.path.join(cookie_path, 'fun-cookiejar.txt')
+if os.path.exists(cookie_path):
+    common.log('Deleting cookie')
+    os.remove(cookie_path)
+
 xbmc.executebuiltin('Notification(%s, %s, %d, %s)'%(name, msg, duration, icon))

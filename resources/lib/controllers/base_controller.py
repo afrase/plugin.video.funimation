@@ -1,11 +1,12 @@
-import sys
+from sys import modules
 
 
 class BaseController(object):
+
     def __init__(self):
-        self._plugin = sys.modules['__main__'].plugin
-        self._common = sys.modules['__main__'].common
-        self._utils = sys.modules['__main__'].utils
+        self.settings = modules['__main__'].settings
+        self.utils = modules['__main__'].utils
+        self.log = modules['__main__'].common.log
 
         self._items = []
 

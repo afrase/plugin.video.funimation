@@ -1,5 +1,7 @@
 import sys
 import os
+import time
+from functools import wraps
 
 STRINGS = {
     'shows': 30010,
@@ -54,52 +56,54 @@ STRINGS = {
 class Utils(object):
     def __init__(self):
         self.xbmc = sys.modules['__main__'].xbmc
-        self.plugin = sys.modules['__main__'].plugin
+        self.settings = sys.modules['__main__'].settings
         self.language = sys.modules['__main__'].language
-        self.common = sys.modules['__main__'].common
+        self.log = sys.modules['__main__'].common.log
 
-    def get_thumbnail(self, title):
-        if not title:
+    def get_thumbnail(self, title=None):
+        if title is None:
             title = 'DefaultFolder'
-        thumbnail_path = os.path.join(self.plugin.getAddonInfo('path'), 'thumbnails')
+        thumbnail_path = os.path.join(self.settings.getAddonInfo('path'), 'thumbnails')
         thumbnail = os.path.join(thumbnail_path, title + '.png')
         if not os.path.isfile(thumbnail):
             thumbnail = 'DefaultFolder.png'
-
+        self.log('Thumbnail: ' + thumbnail, 5)
         return thumbnail
 
-    def show_message(self, message, title=None, icon=None):
-        self.common.log(repr(title) + " - " + repr(message), 5)
-        duration = ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10][int(self.plugin.getSetting('notification_length'))]) * 1000
-        if not title:
-            title = self.plugin.getAddonInfo('name')
-        if not icon:
-            icon = self.plugin.getAddonInfo('icon')
-        self.xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (title, message, duration, icon))
+    def show_message(self, msg, title=None, icon=None):
+        dur = int(self.settings.getSetting('notification_length'))
+        if title is None:
+            title = self.settings.getAddonInfo('name')
+        if icon is None:
+            icon = self.settings.getAddonInfo('icon')
+
+        self.xbmc.executebuiltin(
+            'Notification({title}, {msg}, {dur}, {icon})'.format(**locals()))
 
     def show_error_message(self, result=None, title=None):
-        if not title:
+        if title is None:
             title = self.get_string('error')
-
-        if result:
-            self.show_message(result, title)
-        else:
-            self.show_message(self.get_string('unknown_error'), title)
+        if result is None:
+            result = self.get_string('unknown_error')
+        self.show_message(result, title)
 
     def build_item_url(self, item_params=None, url=''):
-        self.common.log('url: %s items: %s' % (repr(url), repr(item_params)), 9)
-        if not item_params: item_params = {}
-
+        self.log('url: %s items: %s' % (repr(url), repr(item_params)), 5)
         blacklist = ('path', 'thumbnail', 'icon', 'Title', 'Title2')
+        if item_params is None:
+            item_params = {}
 
         for key, value in item_params.items():
             if key not in blacklist:
                 url += key + '=' + value + '&'
+
         return url
 
     def add_next_folder(self, items=None, params=None):
-        if not params: params = {}
-        if not items: items = []
+        if params is None:
+            params = {}
+        if items is None:
+            items = []
 
         get = params.get
         item = {"Title": self.get_string('more_results'), "thumbnail": "next", "next": "true", "page": str(int(get("page", "0")) + 1)}
@@ -111,10 +115,10 @@ class Utils(object):
     def get_string(self, string_id):
         if string_id in STRINGS:
             string = self.language(STRINGS[string_id]).encode('utf-8')
-            self.common.log('%s translates to %s' % (STRINGS[string_id], string), 5)
+            self.log('%s translates to %s' % (STRINGS[string_id], string), 5)
             return string
         else:
-            self.common.log('String is missing: %s' % string_id, 5)
+            self.log('String is missing: ' + string_id, 5)
             return string_id
 
     def stream_url(self, video_id, hd=False):
@@ -125,10 +129,10 @@ class Utils(object):
             quality = '2000'
 
         base_url = 'http://wpc.8c48.edgecastcdn.net'
+        # this value doesn't seem to change
         uid = '9b303b6c62204a9dcb5ce5f5c607'
-        url = '%s/038C48/SV/480/%s/%s-480-%sK.mp4.m3u8?%s' % (
-            base_url, video_id, video_id, quality, uid)
-        self.common.log(url, 9)
+        url = '{base_url}/038C48/SV/480/{video_id}/{video_id}-480-{quality}K.mp4.m3u8?{uid}'.format(**locals())
+        self.log(url, 5)
         return url
 
     @staticmethod
@@ -139,3 +143,49 @@ class Utils(object):
         elif len(t.split(':')) == 3:
             h, m, s = [int(i) for i in t.split(':')]
             return (3600 * h + 60 * m + s) / 60
+
+    @staticmethod
+    def timethis(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start = time.time()
+            f = func(*args, **kwargs)
+            end = time.time()
+            sys.modules['__main__'].common.log('{0}.{1} : {2} sec'.format(
+                func.__module__, func.__name__, end - start))
+            return f
+        return wrapper
+
+
+class Timer:
+
+    def __init__(self, func=time.time):
+        self.elapsed = 0.0
+        self._func = func
+        self._start = None
+
+    @property
+    def running(self):
+        return self._start is not None
+
+    def start(self):
+        if self._start is not None:
+            raise RuntimeError('Already started')
+        self._start = self._func()
+
+    def stop(self):
+        if self._start is None:
+            raise RuntimeError('Not started')
+        end = self._func()
+        self.elapsed += end - self._start
+        self._start = None
+
+    def reset(self):
+        self.elapsed = 0.0
+
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, *args):
+        self.stop()

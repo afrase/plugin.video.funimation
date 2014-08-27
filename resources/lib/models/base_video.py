@@ -1,7 +1,8 @@
-from resources.lib.models.base_model import BaseModel
+from .base_model import BaseModel
 
 
 class BaseVideo(BaseModel):
+
     def __init__(self, json):
         super(BaseVideo, self).__init__(json)
         get = self.json.get

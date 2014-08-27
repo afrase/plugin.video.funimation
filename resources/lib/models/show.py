@@ -1,14 +1,16 @@
-from resources.lib.models.base_video import BaseModel
+from .base_video import BaseModel
 
 
 class Show(BaseModel):
+
     def __init__(self, json):
         super(Show, self).__init__(json)
         get = self.json.get
 
         self.maturity = get('maturity rating')
         self.post_date = get('post date')
-        self.genres = [i.lower().replace(' ', '_') for i in get('all terms', '').split(', ')]
+        self.genres = [i.lower().replace(' ', '_')
+                       for i in get('all terms', '').split(', ')]
         self.votes = get('votes')
         self.mobile_banner_large = get('mobile_banner_large')
         self.similar_shows = get('similar_shows', '').split(',')

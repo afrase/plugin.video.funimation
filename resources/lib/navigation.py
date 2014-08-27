@@ -1,5 +1,4 @@
 import sys
-from resources.lib.api import Api
 
 
 class Navigation(object):
@@ -9,10 +8,10 @@ class Navigation(object):
         self.xbmcplugin = sys.modules['__main__'].xbmcplugin
 
         self.common = sys.modules['__main__'].common
-        self.plugin = sys.modules['__main__'].plugin
+        self.settings = sys.modules['__main__'].settings
         self.utils = sys.modules['__main__'].utils
         self.cache = sys.modules['__main__'].cache
-        self.api = Api()
+        self.api = sys.modules['__main__'].api
 
         _ = self.utils.get_string
 
@@ -27,11 +26,10 @@ class Navigation(object):
 
     def list_menu(self, params=None):
         self.common.log(repr(params), 5)
-        if not params: params = {}
+        if params is None:
+            params = {}
 
         get = params.get
-        cache = True
-
         path = get('path', '/root')
         if (get('get') not in ['search', 'shows'] or get('show')) and not get('type'):
             for category in self.categories:
@@ -52,16 +50,17 @@ class Navigation(object):
             if get('type') or get('get') in ['shows', 'search']:
                 return self.list(params)
 
-        video_view = self.plugin.getSetting('list_view') == '1'
+        video_view = self.settings.getSetting('list_view') == '1'
         if video_view:
             self.xbmc.executebuiltin('Container.SetViewMode(500)')
 
-        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, cacheToDisc=cache)
+        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True)
         self.common.log('Done', 5)
 
     def list(self, params=None):
         self.common.log(repr(params), 5)
-        if not params: params = {}
+        if params is None:
+            params = {}
 
         get = params.get
         if get('get') == 'search':
@@ -132,16 +131,18 @@ class Navigation(object):
 
     def show_listing_error(self, params=None):
         self.common.log(repr(params), 5)
-        if not params: params = {}
+        if params is None:
+            params = {}
         self.utils.show_error_message(params['error'])
 
     def add_list_item(self, params=None, item_params=None):
-        self.common.log(repr(item_params), 5)
-        if not item_params: item_params = {}
-        if not params: params = {}
+        self.common.log('params: %s items: %s' % (repr(params), repr(item_params)), 5)
+        if item_params is None:
+            item_params = {}
+        if params is None:
+            params = {}
 
         item = item_params.get
-
         if not item('action'):
             if item('login', 'false') == 'false':
                 self.add_folder_list_item(params, item_params)
@@ -153,9 +154,11 @@ class Navigation(object):
         self.common.log('Done', 5)
 
     def add_folder_list_item(self, params=None, item_params=None, size=0):
-        self.common.log('params: %s items: %s' % (repr(params), repr(item_params)), 9)
-        if not item_params: item_params = {}
-        if not params: params = {}
+        self.common.log('params: %s items: %s' % (repr(params), repr(item_params)), 5)
+        if item_params is None:
+            item_params = {}
+        if params is None:
+            params = {}
 
         get = params.get
         item = item_params.get
@@ -193,12 +196,14 @@ class Navigation(object):
         self.common.log('Done', 9)
 
     def add_action_list_item(self, params=None, item_params=None, size=0):
-        self.common.log('', 5)
-        if not params: params = {}
-        if not item_params: item_params = {}
+        self.common.log('params: %s items: %s' % (repr(params), repr(item_params)), 5)
+        if params is None:
+            params = {}
+        if item_params is None:
+            item_params = {}
 
-        item = item_params.get
         folder = True
+        item = item_params.get
         icon = 'DefaultFolder.png'
         thumbnail = self.utils.get_thumbnail(item('thumbnail'))
         list_item = self.xbmcgui.ListItem(item('Title'), iconImage=icon, thumbnailImage=thumbnail)
@@ -211,10 +216,12 @@ class Navigation(object):
 
     def add_video_list_item(self, params=None, item_params=None, size=0):
         self.common.log('params: %s items: %s' % (repr(params), repr(item_params)), 9)
-        if not item_params: item_params = {}
-        if not params: params = {}
-        item = item_params.get
+        if item_params is None:
+            item_params = {}
+        if params is None:
+            params = {}
 
+        item = item_params.get
         url = self.utils.stream_url(item('videoid'), item('hd'))
         icon = self.utils.get_thumbnail(item('icon', 'default'))
         list_item = self.xbmcgui.ListItem(item('Title'), iconImage=icon, thumbnailImage=item('thumbnail'))
@@ -226,20 +233,25 @@ class Navigation(object):
         self.common.log('Done', 9)
 
     def add_folder_context_menu_items(self, params=None, item_params=None):
-        self.common.log('', 5)
-        if not item_params: item_params = {}
-        if not params: params = {}
+        self.common.log('params: %s items: %s' % (repr(params), repr(item_params)), 5)
+        if item_params is None:
+            item_params = {}
+        if params is None:
+            params = {}
         self.common.log('Done', 5)
 
     def add_video_context_menu_items(self, params=None, item_params=None):
-        self.common.log('', 5)
-        if not params: params = {}
-        if not item_params: item_params = {}
+        self.common.log('params: %s items: %s' % (repr(params), repr(item_params)), 5)
+        if params is None:
+            params = {}
+        if item_params is None:
+            item_params = {}
         self.common.log('Done', 5)
 
     def execute_action(self, params=None):
         self.common.log(repr(params), 5)
-        if not params: params = {}
+        if params is None:
+            params = {}
         get = params.get
         if get('action') == 'play_video':
             self.common.log('playing video: %s' % get('videoid'))
@@ -247,16 +259,16 @@ class Navigation(object):
         self.common.log('Done', 5)
 
     def parse_show_list(self, params, results):
-        self.common.log(repr(params), 9)
+        self.common.log(repr(params), 5)
         list_size = len(results)
         for show in results.all(params.get('type')):
             self.add_folder_list_item(params, show, list_size)
 
-        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, cacheToDisc=True)
-        self.common.log('Done', 9)
+        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
+        self.common.log('Done', 5)
 
     def parse_episode_list(self, params, results):
-        self.common.log(repr(params), 9)
+        self.common.log(repr(params), 5)
         list_size = len(results)
         item = {'path': '/root/shows/episodes', 'folder': 'true', 'show': results.show_id, 'type': 'episodes'}
         for episode in results.itemize():
@@ -268,15 +280,15 @@ class Navigation(object):
             item['thumbnail'] = 'next'
             self.add_folder_list_item(params, item)
 
-        video_view = int(self.plugin.getSetting("list_view")) >= 1
+        video_view = int(self.settings.getSetting("list_view")) >= 1
         if video_view:
             self.xbmc.executebuiltin("Container.SetViewMode(500)")
 
-        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, cacheToDisc=True)
-        self.common.log('Done', 9)
+        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
+        self.common.log('Done', 5)
 
     def parse_movie_list(self, params, results):
-        self.common.log(repr(params), 9)
+        self.common.log(repr(params), 5)
         list_size = len(results.movies)
         item = {'path': '/root/shows/movies', 'folder': 'true', 'show': results.show_id, 'type': 'movies'}
         for movie in results.itemize():
@@ -288,15 +300,15 @@ class Navigation(object):
             item['thumbnail'] = 'next'
             self.add_folder_list_item(params, item)
 
-        video_view = int(self.plugin.getSetting("list_view")) >= 1
+        video_view = int(self.settings.getSetting("list_view")) >= 1
         if video_view:
             self.xbmc.executebuiltin("Container.SetViewMode(500)")
 
-        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, cacheToDisc=True)
-        self.common.log('Done', 9)
+        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
+        self.common.log('Done', 5)
 
     def parse_trailers_list(self, params, results):
-        self.common.log(repr(params), 9)
+        self.common.log(repr(params), 5)
         list_size = len(results)
         item = {'path': '/root/shows/trailers', 'folder': 'true', 'show': results.show_id, 'type': 'trailers'}
         for trailer in results.itemize():
@@ -308,15 +320,15 @@ class Navigation(object):
             item['thumbnail'] = 'next'
             self.add_folder_list_item(params, item)
 
-        video_view = int(self.plugin.getSetting("list_view")) >= 1
+        video_view = int(self.settings.getSetting("list_view")) >= 1
         if video_view:
             self.xbmc.executebuiltin("Container.SetViewMode(500)")
 
-        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, cacheToDisc=True)
-        self.common.log('Done', 9)
+        self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
+        self.common.log('Done', 5)
 
     def parse_clips_list(self, params, results):
-        self.common.log(repr(params), 9)
+        self.common.log(repr(params), 5)
         list_size = len(results)
         item = {'path': '/root/shows/clips', 'folder': 'true', 'show': results.show_id, 'type': 'clips'}
         for clip in results.itemize():
@@ -328,9 +340,9 @@ class Navigation(object):
             item['thumbnail'] = 'next'
             self.add_folder_list_item(params, item)
 
-        video_view = int(self.plugin.getSetting("list_view")) >= 1
+        video_view = int(self.settings.getSetting("list_view")) >= 1
         if video_view:
             self.xbmc.executebuiltin("Container.SetViewMode(500)")
 
         self.xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, cacheToDisc=True)
-        self.common.log('Done', 9)
+        self.common.log('Done', 5)

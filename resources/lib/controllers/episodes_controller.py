@@ -1,4 +1,4 @@
-from resources.lib.controllers.base_controller import BaseController
+from .base_controller import BaseController
 from resources.lib.models.episode import Episode
 
 
@@ -13,17 +13,17 @@ class EpisodesController(BaseController):
         if isinstance(self.json, dict):
             if self.json['nodes'] > 0:
                 for attr in self.json['nodes']:
-                    self._common.log(attr, 9)
+                    self.log(attr, 9)
                     self._items.append(Episode(attr['show']))
 
     def itemize(self):
-        sb = int(self._plugin.getSetting('sub_dub'))
+        sb = int(self.settings.getSetting('sub_dub'))
         if sb == 1:
-            self._common.log('getting subs', 9)
+            self.log('getting subs', 9)
             return [ep.itemize() for ep in self if ep.sub()]
         elif sb == 2:
-            self._common.log('getting subs', 9)
+            self.log('getting subs', 9)
             return [ep.itemize() for ep in self if ep.dub()]
         else:
-            self._common.log(sb, 9)
+            self.log(sb, 9)
             return [ep.itemize() for ep in self]

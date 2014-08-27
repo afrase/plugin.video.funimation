@@ -1,3 +1,8 @@
+v0.1.0
+- Rewrote api classes
+- Removed user model/controller
+- Cleaned up code
+
 v0.0.9
 - Added setting for adding shows to a black list
 - Added http_client param to user_controller
