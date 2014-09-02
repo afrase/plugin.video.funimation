@@ -14,8 +14,8 @@ class Core(object):
     def __init__(self):
         self.xbmc = modules['__main__'].xbmc
         self.settings = modules['__main__'].settings
-        self.log = modules['__main__'].common.log
-        self.utils = modules['__main__'].utils
+        self.common = modules['__main__'].common
+        self.log = self.common.log
 
         self.base_url = 'https://www.funimation.com/{0}'
         self.cookiejar = self._load_cookiejar()
@@ -36,6 +36,7 @@ class Core(object):
         else:
             url = self.base_url.format(endpoint)
 
+        self.log(url, 4)
         if params is None:
             content = self.open(url).read()
         else:
@@ -49,13 +50,13 @@ class Core(object):
             self.settings.getAddonInfo('profile'))
         cookie_path = join(cookie_path, 'fun-cookiejar.txt')
         cookiejar = cookielib.LWPCookieJar(cookie_path, delayload=True)
-        self.log('Loading cookies from :' + repr(cookie_path), 5)
+        self.log('Loading cookies from :' + repr(cookie_path), 4)
         try:
             cookiejar.load()
         except IOError:
-            self.log('Cookie does not exist')
+            self.log('Cookie does not exist', 4)
         except cookielib.LoadError:
-            self.log('The cookie file is unreadable.')
+            self.log('The cookie file is unreadable', 4)
 
         return cookiejar
 

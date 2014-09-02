@@ -1,3 +1,7 @@
+v0.1.1
+- Rewrote almost everything
+- Removed model/controller classes
+
 v0.1.0
 - Rewrote api classes
 - Removed user model/controller

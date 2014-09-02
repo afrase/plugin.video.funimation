@@ -137,55 +137,10 @@ class Utils(object):
 
     @staticmethod
     def to_minutes(t):
-        if len(t.split(':')) == 2:
-            m, s = [int(i) for i in t.split(':')]
+        t = t.split(':')
+        if len(t) == 2:
+            m, s = [int(i) for i in t]
             return (60 * m + s) / 60
-        elif len(t.split(':')) == 3:
-            h, m, s = [int(i) for i in t.split(':')]
+        elif len(t) == 3:
+            h, m, s = [int(i) for i in t]
             return (3600 * h + 60 * m + s) / 60
-
-    @staticmethod
-    def timethis(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            start = time.time()
-            f = func(*args, **kwargs)
-            end = time.time()
-            sys.modules['__main__'].common.log('{0}.{1} : {2} sec'.format(
-                func.__module__, func.__name__, end - start))
-            return f
-        return wrapper
-
-
-class Timer:
-
-    def __init__(self, func=time.time):
-        self.elapsed = 0.0
-        self._func = func
-        self._start = None
-
-    @property
-    def running(self):
-        return self._start is not None
-
-    def start(self):
-        if self._start is not None:
-            raise RuntimeError('Already started')
-        self._start = self._func()
-
-    def stop(self):
-        if self._start is None:
-            raise RuntimeError('Not started')
-        end = self._func()
-        self.elapsed += end - self._start
-        self._start = None
-
-    def reset(self):
-        self.elapsed = 0.0
-
-    def __enter__(self):
-        self.start()
-        return self
-
-    def __exit__(self, *args):
-        self.stop()

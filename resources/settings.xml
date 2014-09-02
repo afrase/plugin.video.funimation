@@ -4,52 +4,16 @@
   <category label="30200">
     <setting id="username" type="text" label="30201" />
     <setting id="password" type="text" label="30202" option="hidden" />
-    <setting type="sep" />
-    <setting id="sub_dub" type="enum" label="30203" lvalues="30204|30205|30206" default="0" />
   </category>
 
   <!-- Advanced -->
   <category label="30210">
     <setting id="notification_length" type="enum" label="30216" values="1|2|3|4|5|6|7|8|9|10" default="2" />
-    <setting id="list_view" type="enum" label="30212" lvalues="30213|30214|30215" default="0" />
     <setting id="cache_time" type="number" label="30217" default="24" />
-    <setting id="black_list" type="text" label="30220" />
     <setting type="sep" />
     <setting id="debug" type="bool" label="30211" default="true" />
     <setting type="sep" />
     <setting label="30218" type="action" action="RunScript($CWD/resources/lib/scripts/clear_cache.py)"/>
   </category>
 
-  <!-- Genres -->
-  <category label="30700">
-    <setting id="action" type="bool" label="30701" default="true" />
-    <setting id="adventure" type="bool" label="30702" default="true" />
-    <setting id="bishonen" type="bool" label="30703" default="true" />
-    <setting id="bishoujo" type="bool" label="30704" default="true" />
-    <setting id="comedy" type="bool" label="30705" default="true" />
-    <setting id="cyberpunk" type="bool" label="30706" default="true" />
-    <setting id="drama" type="bool" label="30707" default="true" />
-    <setting id="fan_service" type="bool" label="30708" default="true" />
-    <setting id="fantasy" type="bool" label="30709" default="true" />
-    <setting id="harem" type="bool" label="30710" default="true" />
-    <setting id="historical" type="bool" label="30711" default="true" />
-    <setting id="horror" type="bool" label="30712" default="true" />
-    <setting id="live_action" type="bool" label="30713" default="true" />
-    <setting id="magical_girl" type="bool" label="30714" default="true" />
-    <setting id="martial_arts" type="bool" label="30715" default="true" />
-    <setting id="mecha" type="bool" label="30716" default="true" />
-    <setting id="moe" type="bool" label="30717" default="true" />
-    <setting id="mystery" type="bool" label="30718" default="true" />
-    <setting id="reverse_harem" type="bool" label="30719" default="true" />
-    <setting id="romance" type="bool" label="30720" default="true" />
-    <setting id="school" type="bool" label="30721" default="true" />
-    <setting id="scifi" type="bool" label="30722" default="true" />
-    <setting id="shonen" type="bool" label="30723" default="true" />
-    <setting id="slice_of_life" type="bool" label="30724" default="true" />
-    <setting id="space" type="bool" label="30725" default="true" />
-    <setting id="sports" type="bool" label="30726" default="true" />
-    <setting id="super_power" type="bool" label="30727" default="true" />
-    <setting id="supernatural" type="bool" label="30728" default="true" />
-    <setting id="yuri" type="bool" label="30729" default="true" />
-  </category>
 </settings>

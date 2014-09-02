@@ -25,9 +25,9 @@ class Login(Core):
             if len(resp['session']) > 32:
                 match = re.match(r'^.*?\\"(.*)\\".*$', resp['session'])
                 if match is None:
-                    self.utils.show_error_message('Unknown login error')
+                    self.common.show_error_message('Unknown login error')
                 else:
-                    self.utils.show_error_message(match.group(1))
+                    self.common.show_error_message(match.group(1))
             else:
                 self.logged_in = True
 

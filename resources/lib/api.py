@@ -1,146 +1,132 @@
-from sys import modules
-
-from .controllers.clips_controller import ClipsController
-from .controllers.episodes_controller import EpisodesController
-from .controllers.movies_controller import MoviesController
-from .controllers.shows_controller import ShowsController
-from .controllers.trailers_controller import TrailersController
-from .controllers.user_controller import UserController
+from sys import modules, argv
 from .core import Core
 from .login import Login
+
+
+order_types = ['asc', 'desc']
+rating_type = ['tvpg', 'tv14', 'tvma', 'nr', 'pg', 'pg13', 'r', 'all']
+sort_types = ['alpha', 'date', 'dvd', 'now', 'soon', 'votes', 'episode',
+              'title', 'sequence']
+genre_types = ['all', 'action', 'adventure', 'bishonen', 'bishoujo', 'comedy',
+               'cyberpunk', 'drama', 'fan service', 'fantasy', 'harem',
+               'historical', 'horror', 'live action', 'magical girl',
+               'martial arts', 'mecha', 'moe', 'mystery', 'reverse harem',
+               'romance', 'school', 'sci fi', 'shonen', 'slice of life',
+               'space', 'sports', 'super power', 'supernatural', 'yuri']
+
+urls = {
+    'details':  'mobile/node/{showid}.json',
+    'search':   'mobile/shows.json/alpha/asc/nl/all/all?keys={term}',
+    'shows':    'mobile/shows.json/{sort}/{order}/{limit}/{rating}/{genre}',
+    'clips':    'mobile/clips.json/sequence/{order}/{showid}/all/all?page={page}',
+    'trailers': 'mobile/trailers.json/sequence/{order}/{showid}/all/all?page={page}',
+    'movies':   'mobile/movies.json/{v_type}/{sort}/{order}/all/{showid}?page={page}',
+    'episodes': 'mobile/episodes.json/{v_type}/sequence/{order}/all/{showid}?page={page}',
+    'stream':   '{base_url}/038C48/SV/480/{video_id}/{video_id}-480-{quality}K.mp4.m3u8?{uid}',
+}
 
 
 class Api(Core):
 
     def __init__(self):
         super(Api, self).__init__()
-
         self.login = Login()
         self.cache = modules['__main__'].cache
+        self.xbmcplugin = modules['__main__'].xbmcplugin
 
-        self.sort_types = ['alpha', 'date', 'dvd', 'now', 'soon', 'votes', 'episode', 'title', 'sequence']
-        self.order_types = ['asc', 'desc']
-        self.rating_type = ['tvpg', 'tv14', 'tvma', 'nr', 'pg', 'pg13', 'r', 'all']
-        self.genre_types = ['all', 'action', 'adventure', 'bishonen', 'bishoujo', 'comedy', 'cyberpunk', 'drama',
-                            'fan_service', 'fantasy', 'harem', 'historical', 'horror', 'live_action', 'magical_girl',
-                            'martial_arts', 'mecha', 'moe', 'mystery', 'reverse_harem', 'romance', 'school', 'scifi',
-                            'shonen', 'slice_of_life', 'space', 'sports', 'super_power', 'supernatural', 'yuri']
+    def get_data(self, method, params):
+        params = self._check_params(**params)
+        url = urls[method].format(**params)
+        return self._get_data(url)
 
-        self.urls = {
-            'shows': '/mobile/shows.json/{sort}/{order}/{limit}/{rating}/{genre}',
-            'episodes': '/mobile/episodes.json/{v_type}/{sort}/{order}/all/{show_id}?page={page}',
-            'movies': '/mobile/movies.json/{v_type}/{sort}/{order}/all/{show_id}?page={page}',
-            'trailers': '/mobile/trailers.json/{sort}/{order}/{show_id}/all/all?page={page}',
-            'clips': '/mobile/clips.json/{sort}/{order}/{show_id}/all/all?page={page}',
-            'search': '/mobile/shows.json/alpha/asc/nl/all/all?keys={term}'
-        }
+    def search_shows(self, term, **kwargs):
+        self.log('Searching for: ' + term, 4)
+        url = urls['search'].format(**locals())
+        return self._get_data(url)
 
-    def search_shows(self, term):
-        self.log(term, 5)
-        url = self.urls['search'].format(**locals())
+    def get_shows(self, **kwargs):
+        kwargs = self._check_params(**kwargs)
 
-        response = self.http.get(url)
-        self.log('Done', 5)
+        self.xbmcplugin.setContent(int(argv[1]), 'tvshows')
+        url = urls['shows'].format(**kwargs)
+        return self._get_data(url)
+
+    def get_episodes(self, **kwargs):
+        kwargs = self._check_params(**kwargs)
+
+        self.xbmcplugin.setContent(int(argv[1]), 'episodes')
+        url = urls['episodes'].format(**kwargs)
+        return self._get_data(url)
+
+    def get_movies(self, **kwargs):
+        kwargs = self._check_params(**kwargs)
+
+        self.xbmcplugin.setContent(int(argv[1]), 'movies')
+        url = urls['movies'].format(**kwargs)
+        return self._get_data(url)
+
+    def get_trailers(self, **kwargs):
+        kwargs = self._check_params(**kwargs)
+
+        self.xbmcplugin.setContent(int(argv[1]), 'episodes')
+        url = urls['trailers'].format(**kwargs)
+        return self._get_data(url)
+
+    def get_clips(self, **kwargs):
+        kwargs = self._check_params(**kwargs)
+
+        self.xbmcplugin.setContent(int(argv[1]), 'episodes')
+        url = urls['clips'].format(**kwargs)
+        return self._get_data(url)
+
+    def get_details(self, **kwargs):
+        kwargs = self._check_params(**kwargs)
+        url = urls['details'].format(**kwargs)
+        return self._get_data(url)
+
+    def stream_url(self, video_id, hd=False):
+        # TODO: figure out the max quality
+        if hd:
+            quality = '3500'
+        else:
+            quality = '2000'
+
+        base_url = 'http://wpc.8c48.edgecastcdn.net'
+        # this value doesn't seem to change
+        uid = '9b303b6c62204a9dcb5ce5f5c607'
+        url = urls['stream'].format(**locals())
+        self.log(url, 5)
+        return url
+
+    def _get_data(self, url):
+        resp = self.get(url)
         try:
-            return ShowsController(response)
+            return self.common.process_response(resp)
         except Exception, e:
-            self.log(e)
+            self.log(e, 4)
             return None
 
-    def get_shows(self, sort=None, order=None, limit=None, rating=None, genre=None):
-        self.log(locals(), 5)
-        if sort is None or self.sort_types not in sort:
+    def _check_params(self, showid=0, page=0, sort=None, order=None, limit=None, rating=None, genre=None, **kwargs):
+        if sort is None or sort_types not in sort:
             sort = 'alpha'
 
-        if order is None or self.order_types not in order:
+        if order is None or order_types not in order:
             order = 'asc'
 
         if limit is None or not limit.isdigit():
-            limit = 'nl' # no limit
+            limit = 'nl'  # no limit
 
-        if rating is None or self.rating_type not in rating:
+        if rating is None or rating not in rating_type:
             rating = 'all'
 
-        if genre is None or self.genre_types not in genre:
+        if genre is None or genre not in genre_types:
             genre = 'all'
-
-        url = self.urls['shows'].format(**locals())
-        response = self.cache.cacheFunction(self.get, url)
-        try:
-            return ShowsController(response)
-        except Exception, e:
-            self.log(e)
-            return None
-
-    def get_episodes(self, show_id, page=0, sort=None, order=None):
-        self.log(locals(), 5)
-        if sort is None or self.sort_types not in sort:
-            sort = 'sequence'
-
-        if order is None or self.order_types not in order:
-            order = 'asc'
 
         # this is can be streaming but not sure how to tell what to use yet.
         # maybe if logged in it's subscription if not it's streaming?
-        v_type = 'subscription'
+        if self.login.logged_in:
+            v_type = 'subscription'
+        else:
+            v_type = 'streaming'
 
-        url = self.urls['episodes'].format(**locals())
-        response = self.cache.cacheFunction(self.get, url)
-
-        try:
-            return EpisodesController(response, show_id, page)
-        except Exception, e:
-            self.log(e)
-            return None
-
-    def get_movies(self, show_id, page=0, sort=None, order=None):
-        self.log(locals(), 5)
-        if sort is None or self.sort_types not in sort:
-            sort = 'sequence'
-
-        if order is None or self.order_types not in order:
-            order = 'asc'
-
-        v_type = 'subscription'
-
-        url = self.urls['movies'].format(**locals())
-        response = self.cache.cacheFunction(self.get, url)
-        try:
-            return MoviesController(response, show_id, page)
-        except Exception, e:
-            self.log(e)
-            return None
-
-    def get_trailers(self, show_id, page=0, sort=None, order=None):
-        self.log(locals(), 5)
-        if sort is None or self.sort_types not in sort:
-            sort = 'sequence'
-
-        if order is None or self.order_types not in order:
-            order = 'asc'
-
-        url = self.urls['trailers'].format(**locals())
-        self.log(url)
-        response = self.cache.cacheFunction(self.get, url)
-        try:
-            return TrailersController(response, show_id, page)
-        except Exception, e:
-            self.log(e)
-            return None
-
-    def get_clips(self, show_id, page=0, sort=None, order=None):
-        self.log(locals(), 5)
-        if sort is None or self.sort_types not in sort:
-            sort = 'sequence'
-
-        if order is None or self.order_types not in order:
-            order = 'asc'
-
-        url = self.urls['clips'].format(**locals())
-        self.log(url)
-        response = self.cache.cacheFunction(self.get, url)
-        try:
-            return ClipsController(response, show_id, page)
-        except Exception, e:
-            self.log(e)
-            return None
+        return locals()
