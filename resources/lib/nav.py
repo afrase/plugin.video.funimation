@@ -21,7 +21,7 @@ _ = common.get_string
 menus = (
     {'label': _('shows'),      'path': '/show',            'folder': 'true', 'get': 'shows'},
     {'label': _('genres'),     'path': '/genre',           'folder': 'true'},
-    # {'label': _('search'),     'path': '/search',          'folder': 'true', 'get': 'search'},
+    {'label': _('search'),     'path': '/search',          'folder': 'true'},
     {'label': _('episodes'),   'path': '/show/episodes',   'folder': 'true', 'get': 'episodes'},
     {'label': _('movies'),     'path': '/show/movies',     'folder': 'true', 'get': 'movies'},
     {'label': _('clips'),      'path': '/show/clips',      'folder': 'true', 'get': 'clips'},
@@ -32,13 +32,15 @@ def list_menu():
     params = common.get_params()
     common.log('PARAMS: ' + repr(params))
     get = params.get('get')
+    path = params.get('path', '/')
     # if query has get then it should run something
     if get:
         get_menu_data(params)
-    elif params.get('path') == '/genre':
+    elif path == '/genre':
         display_grenres()
+    elif path == '/search':
+        display_search()
     else:
-        path = params.get('path', '/')
         for menu in menus:
             m_path = os.path.dirname(menu['path'])
             # if path in query is parent of static menu path
@@ -66,6 +68,13 @@ def display_grenres():
              'get': 'shows', 'genre': genre.replace('_', ' ')}
         add_list_item(q)
 
+
+def display_search():
+    term = common.get_user_input(_('search_shows'))
+    params = {'get': 'search', 'term': term}
+    get_menu_data(params)
+
+
 def add_list_item(query, items=None):
     if items is None:
         items = query
@@ -78,7 +87,7 @@ def add_list_item(query, items=None):
 def get_list_item(items):
     get = items.get
     li = xbmcgui.ListItem(get('label'), get('label2'), get('icon'), get('thumbnail'))
-    li.setInfo('video', items.get('info'))
+    li.setInfo('video', get('info'))
     return li
 
 def add_folder_list_item(query, items):
@@ -103,13 +112,27 @@ def get_menu_data(params):
     if total_items == 50:
         add_next_item(params)
 
+    if total_items == 0:
+        display_error_item(params)
+
     for item in resp:
         item.total = total_items
         add_list_item(item.query_string, item)
 
+def display_error_item(params):
+    query = {}
+    # no_episodes, no_movies, etc.
+    query['label'] = _('no_' + params.get('get'))
+    query['folder'] = 'true'
+    query['showid'] = params.get('showid')
+    add_list_item(query)
+
 def add_next_item(params):
-    item = {'label': _('next') + ' >>', 'path': '/show/next',
-            'folder': 'true', 'get': params['get'],
-            'page': int(params.get('page', 0)) + 1,
-            'showid': params['showid']}
-    add_list_item(item)
+    query = {}
+    query['label'] = _('next') + ' >>'
+    query['path'] = '/show/next'
+    query['folder'] = 'true'
+    query['get'] = params.get('get')
+    query['page'] = int(params.get('page', 0)) + 1
+    query['showid'] = params.get('showid')
+    add_list_item(query)

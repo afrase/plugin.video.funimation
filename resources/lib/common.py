@@ -198,21 +198,6 @@ def get_user_input(title, default=None, hidden=False):
     return result
 
 
-def add_next_folder(items=None, params=None):
-    if params is None:
-        params = {}
-    if items is None:
-        items = []
-
-    get = params.get
-    item = {'label': get_string('more_results'), 'thumbnail': 'next',
-            'next': 'true', 'page': str(int(get('page', '0')) + 1)}
-    for k, v in params.items():
-        if k != 'thumbnail' and k != 'Title' and k != 'page' and k != 'new_results_function':
-            item[k] = v
-    items.append(item)
-
-
 def build_url(map):
     return argv[0] + '?' + urlencode(map)
 

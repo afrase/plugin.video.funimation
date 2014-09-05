@@ -39,7 +39,7 @@ class Api(Core):
         url = urls[method].format(**params)
         return self._get_data(url)
 
-    def search_shows(self, term, **kwargs):
+    def get_search(self, term, **kwargs):
         self.log('Searching for: ' + term, 4)
         url = urls['search'].format(**locals())
         return self._get_data(url)
@@ -104,9 +104,9 @@ class Api(Core):
             return self.common.process_response(resp)
         except Exception, e:
             self.log(e, 4)
-            return None
+            return []
 
-    def _check_params(self, showid=0, page=0, sort=None, order=None, limit=None, rating=None, genre=None, **kwargs):
+    def _check_params(self, showid=0, page=0, sort=None, order=None, limit=None, rating=None, genre=None, term=None, **kwargs):
         if sort is None or sort_types not in sort:
             sort = 'alpha'
 
@@ -121,6 +121,9 @@ class Api(Core):
 
         if genre is None or genre not in genre_types:
             genre = 'all'
+
+        if term is None:
+            term = ''
 
         # this is can be streaming but not sure how to tell what to use yet.
         # maybe if logged in it's subscription if not it's streaming?

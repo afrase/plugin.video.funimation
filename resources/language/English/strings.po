@@ -18,11 +18,11 @@ msgstr ""
 
 # menu strings
 msgctxt "#30010"
-msgid "Browse by Shows"
+msgid "Browse Shows"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Search"
+msgid "Search Shows"
 msgstr ""
 
 msgctxt "#30012"
@@ -54,6 +54,7 @@ msgid "Browse by Rating"
 msgstr ""
 
 # general settings strings
+
 msgctxt "#30200"
 msgid "General"
 msgstr ""
@@ -83,6 +84,7 @@ msgid "Dub"
 msgstr ""
 
 # advanced settings strings
+
 msgctxt "#30210"
 msgid "Advanced"
 msgstr ""
@@ -119,15 +121,8 @@ msgctxt "#30218"
 msgid "Clear cache"
 msgstr ""
 
-msgctxt "#30219"
-msgid "Prefetch (WIP)"
-msgstr ""
-
-msgctxt "#30220"
-msgid "Blacklisted show IDs (comma separated)"
-msgstr ""
-
 # messages
+
 msgctxt "#30600"
 msgid "Error"
 msgstr ""
