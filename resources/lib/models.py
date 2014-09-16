@@ -68,7 +68,7 @@ class Episode(TemplateModel):
 
     @property
     def label(self):
-        return '%d %s (%s)' % (self.episode_number, self.title, self.sub_dub)
+        return '%d. %s (%s)' % (self.episode_number, self.title, self.sub_dub)
 
     @property
     def thumbnail(self):

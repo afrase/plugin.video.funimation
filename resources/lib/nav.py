@@ -102,8 +102,6 @@ def get_menu_data(params):
 
     total_items = len(resp)
     common.log('Got %d %s' % (total_items, get), 4)
-    if total_items == 50:
-        add_next_item(params)
 
     if total_items == 0:
         display_error_item(params)
@@ -111,6 +109,10 @@ def get_menu_data(params):
     for item in resp:
         item.total = total_items
         add_list_item(item.query_string, item)
+
+    # episodes, movies, clips, and trailers only return up to 50 items
+    if get in ('episodes','movies','clips','trailers') and total_items == 50:
+        add_next_item(params)
 
 def display_error_item(params):
     query = {}
