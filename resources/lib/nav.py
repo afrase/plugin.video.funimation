@@ -1,19 +1,12 @@
 import os
 from sys import modules, argv
+from .api import genre_types
 
 xbmcplugin = modules['__main__'].xbmcplugin
 xbmcgui = modules['__main__'].xbmcgui
 common = modules['__main__'].common
 api = modules['__main__'].api
 handle = int(argv[1])
-
-# this list should be in a central spot
-genre_types = ['action', 'adventure', 'bishonen', 'bishoujo', 'comedy',
-               'cyberpunk', 'drama', 'fan_service', 'fantasy', 'harem',
-               'historical', 'horror', 'live_action', 'magical_girl',
-               'martial_arts', 'mecha', 'moe', 'mystery', 'reverse_harem',
-               'romance', 'school', 'sci_fi', 'shonen', 'slice_of_life',
-               'space', 'sports', 'super_power', 'supernatural', 'yuri']
 
 _ = common.get_string
 
@@ -65,7 +58,7 @@ def list_menu():
 def display_grenres():
     for genre in genre_types:
         q = {'label': _(genre), 'path': '/genre', 'folder': 'true',
-             'get': 'shows', 'genre': genre.replace('_', ' ')}
+             'get': 'shows', 'genre': genre}
         add_list_item(q)
 
 
