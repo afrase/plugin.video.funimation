@@ -68,19 +68,7 @@ msgid "Password"
 msgstr ""
 
 msgctxt "#30203"
-msgid "Sub or Dub"
-msgstr ""
-
-msgctxt "#30204"
-msgid "Both"
-msgstr ""
-
-msgctxt "#30205"
-msgid "Sub"
-msgstr ""
-
-msgctxt "#30206"
-msgid "Dub"
+msgid "Enable Caching"
 msgstr ""
 
 # advanced settings strings

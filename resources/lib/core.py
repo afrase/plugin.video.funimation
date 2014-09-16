@@ -14,8 +14,11 @@ class Core(object):
     def __init__(self):
         self.xbmc = modules['__main__'].xbmc
         self.settings = modules['__main__'].settings
+        self.cache = modules['__main__'].cache
         self.common = modules['__main__'].common
         self.log = self.common.log
+
+        self.enable_cache = self.settings.getSetting('enable_cache') == 'true'
 
         self.base_url = 'https://www.funimation.com/{0}'
         self.cookiejar = self._load_cookiejar()
@@ -25,10 +28,16 @@ class Core(object):
         self.open = urllib2.build_opener(cookie_handler).open
 
     def get(self, endpoint):
-        return self._request(endpoint)
+        if self.enable_cache:
+            return self.cache.cacheFunction(self._request, endpoint)
+        else:
+            return self._request(endpoint)
 
     def post(self, endpoint, params):
-        return self._request(endpoint, params)
+        if self.enable_cache:
+            return self.cache.cacheFunction(self._request, endpoint, params)
+        else:
+            return self._request(endpoint, params)
 
     def _request(self, endpoint, params=None):
         if endpoint.startswith('http'):

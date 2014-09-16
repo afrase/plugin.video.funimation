@@ -31,52 +31,11 @@ class Api(Core):
     def __init__(self):
         super(Api, self).__init__()
         self.login = Login()
-        self.cache = modules['__main__'].cache
         self.xbmcplugin = modules['__main__'].xbmcplugin
 
-    def get_data(self, method, params):
+    def get_data(self, endpoint, params):
         params = self._check_params(**params)
-        url = urls[method].format(**params)
-        return self._get_data(url)
-
-    def get_search(self, term, **kwargs):
-        self.log('Searching for: ' + term, 4)
-        url = urls['search'].format(**locals())
-        return self._get_data(url)
-
-    def get_shows(self, **kwargs):
-        kwargs = self._check_params(**kwargs)
-
-        self.xbmcplugin.setContent(int(argv[1]), 'tvshows')
-        url = urls['shows'].format(**kwargs)
-        return self._get_data(url)
-
-    def get_episodes(self, **kwargs):
-        kwargs = self._check_params(**kwargs)
-
-        self.xbmcplugin.setContent(int(argv[1]), 'episodes')
-        url = urls['episodes'].format(**kwargs)
-        return self._get_data(url)
-
-    def get_movies(self, **kwargs):
-        kwargs = self._check_params(**kwargs)
-
-        self.xbmcplugin.setContent(int(argv[1]), 'movies')
-        url = urls['movies'].format(**kwargs)
-        return self._get_data(url)
-
-    def get_trailers(self, **kwargs):
-        kwargs = self._check_params(**kwargs)
-
-        self.xbmcplugin.setContent(int(argv[1]), 'episodes')
-        url = urls['trailers'].format(**kwargs)
-        return self._get_data(url)
-
-    def get_clips(self, **kwargs):
-        kwargs = self._check_params(**kwargs)
-
-        self.xbmcplugin.setContent(int(argv[1]), 'episodes')
-        url = urls['clips'].format(**kwargs)
+        url = urls[endpoint].format(**params)
         return self._get_data(url)
 
     def get_details(self, **kwargs):
@@ -106,7 +65,9 @@ class Api(Core):
             self.log(e, 4)
             return []
 
-    def _check_params(self, showid=0, page=0, sort=None, order=None, limit=None, rating=None, genre=None, term=None, **kwargs):
+    def _check_params(self, showid=0, page=0, sort=None, order=None,
+                      limit=None, rating=None, genre=None, term=None, **kwargs):
+
         if sort is None or sort_types not in sort:
             sort = 'alpha'
 

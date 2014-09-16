@@ -1,3 +1,8 @@
+v0.1.2
+- Added caching
+- Made common plugin cache and optional import
+- Added option to disable caching
+
 v0.1.1
 - Rewrote almost everything
 - Removed model/controller classes
