@@ -23,7 +23,6 @@ menus = (
 
 def list_menu():
     params = common.get_params()
-    common.log('PARAMS: ' + repr(params))
     get = params.get('get')
     path = params.get('path', '/')
     # if query has get then it should run something
@@ -101,7 +100,7 @@ def get_menu_data(params):
     resp = api.get_data(get, params)
 
     total_items = len(resp)
-    common.log('Got %d %s' % (total_items, get), 4)
+    common.log('Got %d %s' % (total_items, get), 5)
 
     if total_items == 0:
         display_error_item(params)

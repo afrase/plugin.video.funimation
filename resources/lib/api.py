@@ -1,6 +1,5 @@
 from sys import modules, argv
 from .core import Core
-from .login import Login
 
 
 order_types = ['asc', 'desc']
@@ -30,7 +29,7 @@ class Api(Core):
 
     def __init__(self):
         super(Api, self).__init__()
-        self.login = Login()
+        self.login()
         self.xbmcplugin = modules['__main__'].xbmcplugin
 
     def get_data(self, endpoint, params):
@@ -54,15 +53,39 @@ class Api(Core):
         # this value doesn't seem to change
         uid = '9b303b6c62204a9dcb5ce5f5c607'
         url = urls['stream'].format(**locals())
-        self.log(url, 5)
+        self.log(url, 4)
         return url
+
+    def login(self):
+        if self.cookie_expired:
+            self._login()
+        else:
+            self.logged_in = True
+
+    def _login(self):
+        user = self.settings.getSetting('username')
+        passwd = self.settings.getSetting('password')
+        if user and passwd:
+            payload = {'username': user, 'password':
+                       passwd, 'sessionid': self._get_session()}
+
+            resp = self.post('phunware/user/login.json', payload, False)['user']
+            if len(resp['session']) > 32:
+                match = re.match(r'^.*?\\"(.*)\\".*$', resp['session'])
+                if match is None:
+                    self.common.show_error_message('Unknown login error')
+                else:
+                    self.common.show_error_message(match.group(1))
+            else:
+                self.common.show_message('Successfully logged in as %s' % user, 'Login Successful')
+                self.logged_in = True
 
     def _get_data(self, url):
         resp = self.get(url)
         try:
             return self.common.process_response(resp)
         except Exception, e:
-            self.log(e, 4)
+            self.log(e, 3)
             return []
 
     def _check_params(self, showid=0, page=0, sort=None, order=None,
@@ -88,9 +111,12 @@ class Api(Core):
 
         # this is can be streaming but not sure how to tell what to use yet.
         # maybe if logged in it's subscription if not it's streaming?
-        if self.login.logged_in:
+        if self.logged_in:
             v_type = 'subscription'
         else:
             v_type = 'streaming'
 
         return locals()
+
+    def _get_session(self):
+        return self.get('phunware/system/connect.json', False)['sessid']

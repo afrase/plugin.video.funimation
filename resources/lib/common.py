@@ -68,7 +68,7 @@ language = modules['__main__'].language
 
 dbg = settings.getSetting('debug') == 'true'
 if dbg:
-    dbglevel = 3
+    dbglevel = 4
 else:
     dbglevel = 0
 
