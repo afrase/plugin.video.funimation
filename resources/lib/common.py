@@ -21,11 +21,7 @@ STRINGMAP = {
     # messages
     'error':            30600,
     'unknown_error':    30601,
-    'no_episodes':      30603,
-    'no_movies':        30604,
-    'no_trailers':      30605,
-    'no_clips':         30606,
-    'no_shows':         30607,
+    'no_results':       30603,
 
     # genres
     'action':           30700,

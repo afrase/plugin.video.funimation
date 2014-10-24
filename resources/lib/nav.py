@@ -158,7 +158,7 @@ def display_details(query, item):
 def display_error_item(query):
     common.log('No items returned for query', common.WARN)
     # no_episodes, no_movies, etc.
-    query['label'] = _('no_' + query.get('get'))
+    query['label'] = _('no_results')
     query['folder'] = 'true'
     query['showid'] = query.get('showid')
     add_list_item(query)

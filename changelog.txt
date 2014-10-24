@@ -1,3 +1,6 @@
+v0.2.1
+- Changed error list item to be more generic
+
 v0.2.0
 - Fixed getting movies
 - Added setting streaming info

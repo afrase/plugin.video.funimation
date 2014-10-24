@@ -161,23 +161,7 @@ msgid "Cache has been cleared"
 msgstr ""
 
 msgctxt "#30603"
-msgid "Show has no episodes"
-msgstr ""
-
-msgctxt "#30604"
-msgid "Show has no movies"
-msgstr ""
-
-msgctxt "#30605"
-msgid "Show has no trailers"
-msgstr ""
-
-msgctxt "#30606"
-msgid "Show has no clips"
-msgstr ""
-
-msgctxt "#30607"
-msgid "No shows"
+msgid "No results"
 msgstr ""
 
 
