@@ -4,8 +4,6 @@ from datetime import datetime
 from urllib import urlencode
 from urlparse import parse_qsl
 from inspect import stack
-from functools import wraps
-from contextlib import contextmanager
 from models import *
 
 
@@ -16,7 +14,7 @@ STRINGMAP = {
     'movies':           30013,
     'trailers':         30014,
     'clips':            30015,
-    'next':             30016,
+    'more':             30016,
     'genres':           30017,
     'rating':           30018,
 
@@ -27,6 +25,7 @@ STRINGMAP = {
     'no_movies':        30604,
     'no_trailers':      30605,
     'no_clips':         30606,
+    'no_shows':         30607,
 
     # genres
     'action':           30700,
@@ -66,14 +65,80 @@ xbmcgui = modules['__main__'].xbmcgui
 settings = modules['__main__'].settings
 language = modules['__main__'].language
 
-dbg = settings.getSetting('debug') == 'true'
-if dbg:
-    dbglevel = 4
-else:
-    dbglevel = 0
+ERROR = 0
+WARN  = 1
+INFO  = 2
+DEBUG = 3
+TRACE = 4
+
+loglevel = int(settings.getSetting('loglvl'))
+
+# 0=both, 1=sub, 2=dub
+sub_dub = int(settings.getSetting('sub_dub'))
+
+
+def show_message(msg, title=None, icon=None):
+    dur = int(settings.getSetting('notification_length'))
+    if title is None:
+        title = settings.getAddonInfo('name')
+    if icon is None:
+        icon = settings.getAddonInfo('icon')
+
+    xbmc.executebuiltin(
+        'Notification({title}, {msg}, {dur}, {icon})'.format(**locals()))
+
+
+def show_error_message(result=None, title=None):
+    if title is None:
+        title = get_string('error')
+    if result is None:
+        result = get_string('unknown_error')
+    show_message(result, title)
+
+
+def get_string(string_key):
+    if string_key in STRINGMAP:
+        string_id = STRINGMAP[string_key]
+        string = language(string_id).encode('utf8')
+        log('%d translates to %s' % (string_id, string), DEBUG)
+        return string
+    else:
+        log('String is missing: ' + string_key, DEBUG)
+        return string_key
+
+
+def get_user_input(title, default=None, hidden=False):
+    if default is None:
+        default = u''
+
+    result = None
+    keyboard = xbmc.Keyboard(default, title)
+    keyboard.setHiddenInput(hidden)
+    keyboard.doModal()
+
+    if keyboard.isConfirmed():
+        result = keyboard.getText()
+
+    return result
+
+
+def build_url(d):
+    return argv[0] + '?' + urlencode(d)
+
+
+def get_params():
+    return dict(parse_qsl(argv[2][1:]))
+
+
+def log(msg, lvl=0):
+    if loglevel >= lvl:
+        log_msg = u'[{0}] {1} : {2}'.format(plugin, stack()[1][3], msg)
+        xbmc.log(log_msg.decode('utf8'), xbmc.LOGNOTICE)
 
 
 def to_minutes(t):
+    if t is None:
+        return 0
     t = t.split(':')
     if len(t) == 2:
         m, s = [int(i) for i in t]
@@ -101,32 +166,32 @@ def fix_keys(d):
 def convert_values(d):
     for k, v in d.items():
         if k == 'video_section' or k == 'aip':
-            d[k] = d[k].values() if isinstance(d[k], dict) else []
+            d[k] = v.values() if isinstance(v, dict) else []
         elif k == 'votes' or k == 'nid' or k == 'show_id':
-            d[k] = int(d[k])
+            d[k] = int(v) if v is not None else 0
         elif k == 'episode_number':
-            d[k] = int(float(d[k]))
+            d[k] = int(float(v)) if v is not None else 0
         elif k == 'post_date':
             try:
-                d[k] = datetime.strptime(d[k], '%m/%d/%Y')
+                d[k] = datetime.strptime(v, '%m/%d/%Y')
             except TypeError:
-                d[k] = datetime(*(strptime(d[k], '%m/%d/%Y')[0:6]))
+                d[k] = datetime(*(strptime(v, '%m/%d/%Y')[0:6]))
         elif k == 'duration':
-            d[k] = to_minutes(d[k])
+            d[k] = to_minutes(v)
         elif k == 'all_terms' or k == 'term':
-            d[k] = d[k].split(', ')
+            d[k] = v.split(', ')
         elif k == 'similar_shows':
-            d[k] = [int(i) for i in d[k].split(',') if isinstance(i, list)]
+            d[k] = [int(i) for i in v.split(',') if isinstance(i, list)]
         elif k == 'video_quality':
-            d[k] = d[k].values() if isinstance(d[k], dict) else [d[k]]
+            d[k] = v.values() if isinstance(v, dict) else [d[k]]
         elif k == 'promo':
-            d[k] = d[k] == 'Promo'
+            d[k] = v == 'Promo'
         elif k == 'type':
-            d[k] = d[k][7:]
+            d[k] = v[7:]
         elif k == 'maturity_rating':
-            d[k] = str(d[k])
+            d[k] = str(v)
         elif k == 'mpaa':
-            d[k] = ','.join(d[k].values()) if isinstance(d[k], dict) else d[k]
+            d[k] = ','.join(v.values()) if isinstance(v, dict) else v
 
     return d
 
@@ -139,7 +204,9 @@ def process_response(data):
     # fix up the values
     data = [convert_values(i) for i in data]
 
-    if data[0].has_key('maturity_rating'):
+    if data[0].has_key('group_title'):
+        return [EpisodeDetail(**i) for i in data]
+    elif data[0].has_key('maturity_rating'):
         return [Show(**i) for i in data]
     elif data[0].has_key('episode_number'):
         return [Episode(**i) for i in data]
@@ -153,81 +220,22 @@ def process_response(data):
         return data
 
 
-def show_message(msg, title=None, icon=None):
-    dur = int(settings.getSetting('notification_length'))
-    if title is None:
-        title = settings.getAddonInfo('name')
-    if icon is None:
-        icon = settings.getAddonInfo('icon')
-
-    xbmc.executebuiltin(
-        'Notification({title}, {msg}, {dur}, {icon})'.format(**locals()))
-
-
-def show_error_message(result=None, title=None):
-    if title is None:
-        title = get_string('error')
-    if result is None:
-        result = get_string('unknown_error')
-    show_message(result, title)
-
-
-def get_string(string_key):
-    if string_key in STRINGMAP:
-        string_id = STRINGMAP[string_key]
-        string = language(string_id).encode('utf-8')
-        log('%d translates to %s' % (string_id, string), 4)
-        return string
+def filter_response(data):
+    # just check the first object since all will be the same
+    if data[0].get('sub_dub') is None:
+        return data
+    # both
+    if sub_dub == 0:
+        log('both')
+        return data
+    # sub
+    elif sub_dub == 1:
+        ret = [ep for ep in data if ep.sub]
+        return ret
+    # dub
+    elif sub_dub == 2:
+        ret = [ep for ep in data if ep.dub]
+        return ret
     else:
-        log('String is missing: ' + string_key, 4)
-        return string_key
-
-
-def get_user_input(title, default=None, hidden=False):
-    if default is None:
-        default = u''
-
-    result = None
-    keyboard = xbmc.Keyboard(default, title)
-    keyboard.setHiddenInput(hidden)
-    keyboard.doModal()
-
-    if keyboard.isConfirmed():
-        result = keyboard.getText()
-
-    return result
-
-
-def build_url(map):
-    return argv[0] + '?' + urlencode(map)
-
-
-def get_params():
-    return dict(parse_qsl(argv[2][1:]))
-
-
-def log(msg, lvl=0):
-    if dbg and dbglevel > lvl:
-        log_msg = u'[{0}] {1} : {2}'.format(plugin, stack()[1][3], msg)
-        xbmc.log(log_msg.decode('utf-8'), xbmc.LOGNOTICE)
-
-
-def timethis(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        f = func(*args, **kwargs)
-        elapsed = time.time() - start
-        log('{0}.{1} : {2}'.format(func.__module__, func.__name__, elapsed))
-        return f
-    return wrapper
-
-
-@contextmanager
-def timeblock(label):
-    start = time.time()
-    try:
-        yield
-    finally:
-        end = time.time()
-        print('{0} : {1}'.format(label, end - start))
+        # just in case
+        return data

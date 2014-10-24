@@ -14,7 +14,7 @@ genre_types = ['all', 'action', 'adventure', 'bishonen', 'bishoujo', 'comedy',
                'space', 'sports', 'super power', 'supernatural', 'yuri']
 
 urls = {
-    'details':  'mobile/node/{showid}.json',
+    'details':  'mobile/node/{showid}',
     'search':   'mobile/shows.json/alpha/asc/nl/all/all?keys={term}',
     'shows':    'mobile/shows.json/{sort}/{order}/{limit}/{rating}/{genre}',
     'clips':    'mobile/clips.json/sequence/{order}/{showid}/all/all?page={page}',
@@ -29,31 +29,19 @@ class Api(Core):
 
     def __init__(self):
         super(Api, self).__init__()
+        self.logged_in = False
         self.login()
-        self.xbmcplugin = modules['__main__'].xbmcplugin
 
     def get_data(self, endpoint, params):
         params = self._check_params(**params)
         url = urls[endpoint].format(**params)
         return self._get_data(url)
 
-    def get_details(self, **kwargs):
-        kwargs = self._check_params(**kwargs)
-        url = urls['details'].format(**kwargs)
-        return self._get_data(url)
-
-    def stream_url(self, video_id, hd=False):
-        # TODO: figure out the max quality
-        if hd:
-            quality = '3500'
-        else:
-            quality = '2000'
-
+    def stream_url(self, video_id, quality):
         base_url = 'http://wpc.8c48.edgecastcdn.net'
         # this value doesn't seem to change
         uid = '9b303b6c62204a9dcb5ce5f5c607'
         url = urls['stream'].format(**locals())
-        self.log(url, 4)
         return url
 
     def login(self):
@@ -68,33 +56,38 @@ class Api(Core):
         if user and passwd:
             payload = {'username': user, 'password':
                        passwd, 'sessionid': self._get_session()}
-
-            resp = self.post('phunware/user/login.json', payload, False)['user']
+            resp = self.post(
+                'phunware/user/login.json', payload, False)['user']
+            # this isn't a very good way to tell if the login was successful
             if len(resp['session']) > 32:
                 match = re.match(r'^.*?\\"(.*)\\".*$', resp['session'])
                 if match is None:
                     self.common.show_error_message('Unknown login error')
+                    self.logged_in = False
                 else:
                     self.common.show_error_message(match.group(1))
+                    self.logged_in = False
             else:
-                self.common.show_message('Successfully logged in as %s' % user, 'Login Successful')
+                self.common.show_message(
+                    'Successfully logged in as %s' % user, 'Login Successful')
                 self.logged_in = True
 
     def _get_data(self, url):
-        resp = self.get(url)
         try:
-            return self.common.process_response(resp)
+            resp = self.get(url)
+            data = self.common.process_response(resp)
+            return self.common.filter_response(data)
         except Exception, e:
-            self.log(e, 3)
+            self.log('ERROR: %s URL: %s ' % (e, self.base_url.format(url)))
             return []
 
     def _check_params(self, showid=0, page=0, sort=None, order=None,
                       limit=None, rating=None, genre=None, term=None, **kwargs):
 
-        if sort is None or sort_types not in sort:
-            sort = 'alpha'
+        if sort is None or sort not in sort_types:
+            sort = 'date'
 
-        if order is None or order_types not in order:
+        if order is None or order not in order_types:
             order = 'asc'
 
         if limit is None or not limit.isdigit():
@@ -109,8 +102,9 @@ class Api(Core):
         if term is None:
             term = ''
 
-        # this is can be streaming but not sure how to tell what to use yet.
-        # maybe if logged in it's subscription if not it's streaming?
+        # this is can be streaming or subscription but not sure how to
+        # tell what to use yet. maybe if logged in it's subscription if
+        # not it's streaming?
         if self.logged_in:
             v_type = 'subscription'
         else:

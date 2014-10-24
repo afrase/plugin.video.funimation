@@ -16,7 +16,8 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# menu strings
+
+# menu items 30010-30020
 msgctxt "#30010"
 msgid "Browse Shows"
 msgstr ""
@@ -42,7 +43,7 @@ msgid "Clips"
 msgstr ""
 
 msgctxt "#30016"
-msgid "Next"
+msgid "More Results"
 msgstr ""
 
 msgctxt "#30017"
@@ -53,8 +54,8 @@ msgctxt "#30018"
 msgid "Browse by Rating"
 msgstr ""
 
-# general settings strings
 
+# general settings 30200-30205
 msgctxt "#30200"
 msgid "General"
 msgstr ""
@@ -71,14 +72,30 @@ msgctxt "#30203"
 msgid "Enable Caching"
 msgstr ""
 
-# advanced settings strings
+msgctxt "#30204"
+msgid "Sub or Dub?"
+msgstr ""
 
+msgctxt "#30205"
+msgid "Both"
+msgstr ""
+
+msgctxt "#30206"
+msgid "Sub"
+msgstr ""
+
+msgctxt "#30207"
+msgid "Dub"
+msgstr ""
+
+
+# advanced settings 30210-30220
 msgctxt "#30210"
 msgid "Advanced"
 msgstr ""
 
 msgctxt "#30211"
-msgid "Debug"
+msgid "Log level"
 msgstr ""
 
 msgctxt "#30212"
@@ -109,8 +126,28 @@ msgctxt "#30218"
 msgid "Clear cache"
 msgstr ""
 
-# messages
+msgctxt "#30219"
+msgid "Errors"
+msgstr ""
 
+msgctxt "#30220"
+msgid "Warnings"
+msgstr ""
+
+msgctxt "#30221"
+msgid "informational"
+msgstr ""
+
+msgctxt "#30222"
+msgid "Debugging"
+msgstr ""
+
+msgctxt "#30223"
+msgid "Tracing"
+msgstr ""
+
+
+# messages 30600-30610
 msgctxt "#30600"
 msgid "Error"
 msgstr ""
@@ -139,8 +176,12 @@ msgctxt "#30606"
 msgid "Show has no clips"
 msgstr ""
 
-# genre strings
+msgctxt "#30607"
+msgid "No shows"
+msgstr ""
 
+
+# genres 30700-30730
 msgctxt "#30700"
 msgid "Action"
 msgstr ""

@@ -16,19 +16,10 @@ Since the plugin is not part of an official XBMC repository, dependencies will
 not be installed automatically.
 
 1. [Common Plugin Cache](http://wiki.xbmc.org/index.php?title=Add-on:Common_plugin_cache)
-2. [Common Functions and ParseDOM](https://github.com/HenrikDK/xbmc-common-plugin-functions)
 
 Install
 -------
 **Common Plugin Cache** can be installed through the XMBC add-on manager.
-
-**Common Functions and ParseDOM** can be installed by adding the YouTube
-add-on or by cloning the git repo into the XBMC add-ons folder.
-
-    cd ~/.xbmc/addons
-    git clone https://github.com/HenrikDK/xbmc-common-plugin-functions.git
-    mv xbmc-common-plugin-functions/plugin script.module.parsedom
-    rm -rf xbmc-common-plugin-functions
 
 **Installing the Funimation add-on**
 
@@ -37,8 +28,8 @@ add-on or by cloning the git repo into the XBMC add-ons folder.
 
 Todo
 ----
++ implement a "My Watchlist"
 + better error handling
-+ create a scrapper for funimation.com instead of using the mobile API
 + add more ways to browse shows
 + get show icons from different site
 + context menu for getting show details

@@ -7,6 +7,7 @@ from os.path import join
 
 
 class Core(object):
+
     '''
     This class handles loading the cookies and making post and get requests.
     '''
@@ -23,12 +24,11 @@ class Core(object):
 
         self.base_url = 'https://www.funimation.com/{0}'
         self.cookiejar = self._load_cookiejar()
-        self.cookie_expired = self._check_cookie()
-        if self.cookie_expired:
-            self.log('cookie is expired or doesn\'t exist', 3)
+        self.cookie_expired = self._check_session_cookie()
 
         cookie_handler = urllib2.HTTPCookieProcessor(self.cookiejar)
-        self.open = urllib2.build_opener(cookie_handler).open
+        self.opener = urllib2.build_opener(cookie_handler)
+        self.open = self.opener.open
 
     def get(self, endpoint, cache=True):
         if self.enable_cache and cache:
@@ -48,7 +48,7 @@ class Core(object):
         else:
             url = self.base_url.format(endpoint)
 
-        self.log(url, 4)
+        self.log(url, self.common.DEBUG)
         if params is None:
             content = self.open(url).read()
         else:
@@ -62,17 +62,18 @@ class Core(object):
             self.settings.getAddonInfo('profile'))
         cookie_path = join(cookie_path, 'fun-cookiejar.txt')
         cookiejar = cookielib.LWPCookieJar(cookie_path, delayload=True)
-        self.log('Loading cookies from :' + repr(cookie_path), 4)
+        self.log('Loading cookies from :' + repr(cookie_path),
+                 self.common.DEBUG)
         try:
             cookiejar.load()
         except IOError:
-            self.log('Cookie does not exist', 3)
+            self.log('Cookie does not exist', self.common.WARN)
         except cookielib.LoadError:
-            self.log('The cookie file is unreadable', 3)
+            self.log('The cookie file is unreadable', self.common.ERROR)
 
         return cookiejar
 
-    def _check_cookie(self):
+    def _check_session_cookie(self):
         # make sure there are actually cookies
         if self.cookiejar._cookies:
             # get cookie that holds login session. if it has expired cookielib

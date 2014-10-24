@@ -1,3 +1,8 @@
+v0.2.0
+- Fixed getting movies
+- Added setting streaming info
+- Cleaned up some code
+
 v0.1.2
 - Added caching
 - Made common plugin cache and optional import

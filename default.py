@@ -11,7 +11,7 @@ plugin = settings.getAddonInfo('id')
 
 if __name__ == '__main__':
     import resources.lib.common as common
-    common.log('ARGV: ' + repr(sys.argv), 3)
+    common.log('ARGV: ' + repr(sys.argv), common.INFO)
 
     try:
         import StorageServer
