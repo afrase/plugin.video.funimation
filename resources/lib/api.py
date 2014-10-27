@@ -1,158 +1,116 @@
-import sys
-from resources.lib.controllers.clips_controller import ClipsController
-from resources.lib.controllers.episodes_controller import EpisodesController
-from resources.lib.controllers.movies_controller import MoviesController
-from resources.lib.controllers.shows_controller import ShowsController
-from resources.lib.controllers.trailers_controller import TrailersController
-from resources.lib.controllers.user_controller import UserController
-from resources.lib.http_client import HTTPClient
+from sys import modules, argv
+from .core import Core
 
 
-class Api():
+order_types = ['asc', 'desc']
+rating_type = ['tvpg', 'tv14', 'tvma', 'nr', 'pg', 'pg13', 'r', 'all']
+sort_types = ['alpha', 'date', 'dvd', 'now', 'soon', 'votes', 'episode',
+              'title', 'sequence']
+genre_types = ['all', 'action', 'adventure', 'bishonen', 'bishoujo', 'comedy',
+               'cyberpunk', 'drama', 'fan service', 'fantasy', 'harem',
+               'historical', 'horror', 'live action', 'magical girl',
+               'martial arts', 'mecha', 'moe', 'mystery', 'reverse harem',
+               'romance', 'school', 'sci fi', 'shonen', 'slice of life',
+               'space', 'sports', 'super power', 'supernatural', 'yuri']
+
+urls = {
+    'details':  'mobile/node/{showid}',
+    'search':   'mobile/shows.json/alpha/asc/nl/all/all?keys={term}',
+    'shows':    'mobile/shows.json/{sort}/{order}/{limit}/{rating}/{genre}',
+    'clips':    'mobile/clips.json/sequence/{order}/{showid}/all/all?page={page}',
+    'trailers': 'mobile/trailers.json/sequence/{order}/{showid}/all/all?page={page}',
+    'movies':   'mobile/movies.json/{v_type}/{sort}/{order}/all/{showid}?page={page}',
+    'episodes': 'mobile/episodes.json/{v_type}/sequence/{order}/all/{showid}?page={page}',
+    'stream':   '{base_url}/038C48/SV/480/{video_id}/{video_id}-480-{quality}K.mp4.m3u8?{uid}',
+}
+
+
+class Api(Core):
+
     def __init__(self):
-        self.http = HTTPClient()
-        self.user = UserController(self.http)
-        self.common = sys.modules['__main__'].common
-        self.cache = sys.modules['__main__'].cache
+        super(Api, self).__init__()
+        self.logged_in = False
+        self.login()
 
-        self.sort_types = ['alpha', 'date', 'dvd', 'now', 'soon', 'votes', 'episode', 'title', 'sequence']
-        self.order_types = ['asc', 'desc']
-        self.rating_type = ['tvpg', 'tv14', 'tvma', 'nr', 'pg', 'pg13', 'r', 'all']
-        self.genre_types = ['all', 'action', 'adventure', 'bishonen', 'bishoujo', 'comedy', 'cyberpunk', 'drama',
-                            'fan_service', 'fantasy', 'harem', 'historical', 'horror', 'live_action', 'magical_girl',
-                            'martial_arts', 'mecha', 'moe', 'mystery', 'reverse_harem', 'romance', 'school', 'scifi',
-                            'shonen', 'slice_of_life', 'space', 'sports', 'super_power', 'supernatural', 'yuri']
+    def get_data(self, endpoint, params):
+        params = self._check_params(**params)
+        url = urls[endpoint].format(**params)
+        return self._get_data(url)
 
-        self.urls = {
-            'shows': '/mobile/shows.json/%s/%s/nl/%s/%s',
-            'episodes': '/mobile/episodes.json/%s/%s/%s/all/%s?page=%s',
-            'movies': '/mobile/movies.json/%s/%s/%s/all/%s?page=%s',
-            'trailers': '/mobile/trailers.json/%s/%s/%s/all/all?page=%s',
-            'clips': '/mobile/clips.json/%s/%s/%s/all/all?page=%s',
-            'search': '/mobile/shows.json/alpha/asc/nl/all/all?keys=%s'
-        }
+    def stream_url(self, video_id, quality):
+        base_url = 'http://wpc.8c48.edgecastcdn.net'
+        # this value doesn't seem to change
+        uid = '9b303b6c62204a9dcb5ce5f5c607'
+        url = urls['stream'].format(**locals())
+        return url
 
-    def search_shows(self, term):
-        self.common.log('', 5)
-        url = self.urls['search'] % term
+    def login(self):
+        if self.cookie_expired:
+            self._login()
+        else:
+            self.logged_in = True
 
-        response = self.http.get(url)
-        self.common.log('Done', 5)
+    def _login(self):
+        user = self.settings.getSetting('username')
+        passwd = self.settings.getSetting('password')
+        if user and passwd:
+            payload = {'username': user, 'password':
+                       passwd, 'sessionid': self._get_session()}
+            resp = self.post(
+                'phunware/user/login.json', payload, False)['user']
+            # this isn't a very good way to tell if the login was successful
+            if len(resp['session']) > 32:
+                match = re.match(r'^.*?\\"(.*)\\".*$', resp['session'])
+                if match is None:
+                    self.common.show_error_message('Unknown login error')
+                    self.logged_in = False
+                else:
+                    self.common.show_error_message(match.group(1))
+                    self.logged_in = False
+            else:
+                self.common.show_message(
+                    'Successfully logged in as %s' % user, 'Login Successful')
+                self.logged_in = True
+
+    def _get_data(self, url):
         try:
-            return ShowsController(response)
+            resp = self.get(url)
+            data = self.common.process_response(resp)
+            return self.common.filter_response(data)
         except Exception, e:
-            self.common.log(e)
-            return None
+            self.log('ERROR: %s URL: %s ' % (e, self.base_url.format(url)))
+            return []
 
-    def get_shows(self, sort_by=None, order_by=None, rating=None, genre=None):
-        self.common.log('', 5)
-        if not sort_by or self.sort_types not in sort_by:
-            sort_by = 'alpha'
+    def _check_params(self, showid=0, page=0, sort=None, order=None,
+                      limit=None, rating=None, genre=None, term=None, **kwargs):
 
-        if not order_by or self.order_types not in order_by:
-            order_by = 'asc'
+        if sort is None or sort not in sort_types:
+            sort = 'date'
 
-        if not rating or self.rating_type not in rating:
+        if order is None or order not in order_types:
+            order = 'asc'
+
+        if limit is None or not limit.isdigit():
+            limit = 'nl'  # no limit
+
+        if rating is None or rating not in rating_type:
             rating = 'all'
 
-        if not genre or self.genre_types not in genre:
+        if genre is None or genre not in genre_types:
             genre = 'all'
 
-        url = self.urls['shows'] % (sort_by, order_by, rating, genre)
+        if term is None:
+            term = ''
 
-        self.user.login()
-
-        response = self.cache.cacheFunction(self.http.get, url)
-
-        self.common.log('Done', 5)
-        try:
-            return ShowsController(response)
-        except Exception, e:
-            self.common.log(e)
-            return None
-
-    def get_episodes(self, show_id, page=0, sort_by=None, order_by=None):
-        self.common.log('', 5)
-        if not sort_by or self.sort_types not in sort_by:
-            sort_by = 'sequence'
-
-        if not order_by or self.order_types not in order_by:
-            order_by = 'asc'
-
-        self.user.login()
-        if self.user.logged_in:
-            video_type = 'subscription'
+        # this is can be streaming or subscription but not sure how to
+        # tell what to use yet. maybe if logged in it's subscription if
+        # not it's streaming?
+        if self.logged_in:
+            v_type = 'subscription'
         else:
-            video_type = 'streaming'
+            v_type = 'streaming'
 
-        url = self.urls['episodes'] % (video_type, sort_by, order_by, show_id, page)
+        return locals()
 
-        response = self.cache.cacheFunction(self.http.get, url)
-
-        try:
-            return EpisodesController(response, show_id, page)
-        except Exception, e:
-            self.common.log(e)
-            return None
-
-    def get_movies(self, show_id, page=0, sort_by=None, order_by=None):
-        self.common.log('', 5)
-        if not sort_by or self.sort_types not in sort_by:
-            sort_by = 'sequence'
-
-        if not order_by or self.order_types not in order_by:
-            order_by = 'asc'
-
-        self.user.login()
-        if self.user.logged_in:
-            video_type = 'subscription'
-        else:
-            video_type = 'streaming'
-
-        url = self.urls['movies'] % (video_type, sort_by, order_by, show_id, page)
-
-        response = self.cache.cacheFunction(self.http.get, url)
-
-        self.common.log('Done', 5)
-        try:
-            return MoviesController(response, show_id, page)
-        except Exception, e:
-            self.common.log(e)
-            return None
-
-    def get_trailers(self, show_id, page=0, sort_by=None, order_by=None):
-        self.common.log('', 5)
-        if not sort_by or self.sort_types not in sort_by:
-            sort_by = 'date'
-
-        if not order_by or self.order_types not in order_by:
-            order_by = 'desc'
-
-        url = self.urls['trailers'] % (sort_by, order_by, show_id, page)
-
-        response = self.cache.cacheFunction(self.http.get, url)
-        self.common.log('Done', 5)
-        try:
-            return TrailersController(response, show_id, page)
-        except Exception, e:
-            self.common.log(e)
-            return None
-
-    def get_clips(self, show_id, page=0, sort_by=None, order_by=None):
-        self.common.log('', 5)
-        if not sort_by or self.sort_types not in sort_by:
-            sort_by = 'date'
-
-        if not order_by or self.order_types not in order_by:
-            order_by = 'desc'
-
-        url = self.urls['clips'] % (sort_by, order_by, show_id, page)
-
-        response = self.cache.cacheFunction(self.http.get, url)
-
-        self.common.log('Done', 5)
-        try:
-            return ClipsController(response, show_id, page)
-        except Exception, e:
-            self.common.log(e)
-            return None
+    def _get_session(self):
+        return self.get('phunware/system/connect.json', False)['sessid']

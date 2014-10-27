@@ -16,13 +16,14 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# menu strings
+
+# menu items 30010-30020
 msgctxt "#30010"
-msgid "Shows"
+msgid "Browse Shows"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Search"
+msgid "Search Shows"
 msgstr ""
 
 msgctxt "#30012"
@@ -42,10 +43,19 @@ msgid "Clips"
 msgstr ""
 
 msgctxt "#30016"
-msgid "More results"
+msgid "More Results"
 msgstr ""
 
-# general settings strings
+msgctxt "#30017"
+msgid "Browse by Genre"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Browse by Rating"
+msgstr ""
+
+
+# general settings 30200-30205
 msgctxt "#30200"
 msgid "General"
 msgstr ""
@@ -59,28 +69,33 @@ msgid "Password"
 msgstr ""
 
 msgctxt "#30203"
-msgid "Sub or Dub"
+msgid "Enable Caching"
 msgstr ""
 
 msgctxt "#30204"
-msgid "Both"
+msgid "Sub or Dub?"
 msgstr ""
 
 msgctxt "#30205"
-msgid "Sub"
+msgid "Both"
 msgstr ""
 
 msgctxt "#30206"
+msgid "Sub"
+msgstr ""
+
+msgctxt "#30207"
 msgid "Dub"
 msgstr ""
 
-# advanced settings strings
+
+# advanced settings 30210-30220
 msgctxt "#30210"
 msgid "Advanced"
 msgstr ""
 
 msgctxt "#30211"
-msgid "Debug"
+msgid "Log level"
 msgstr ""
 
 msgctxt "#30212"
@@ -112,14 +127,27 @@ msgid "Clear cache"
 msgstr ""
 
 msgctxt "#30219"
-msgid "Prefetch (WIP)"
+msgid "Errors"
 msgstr ""
 
 msgctxt "#30220"
-msgid "Blacklisted show IDs (comma separated)"
+msgid "Warnings"
 msgstr ""
 
-# messages
+msgctxt "#30221"
+msgid "informational"
+msgstr ""
+
+msgctxt "#30222"
+msgid "Debugging"
+msgstr ""
+
+msgctxt "#30223"
+msgid "Tracing"
+msgstr ""
+
+
+# messages 30600-30610
 msgctxt "#30600"
 msgid "Error"
 msgstr ""
@@ -133,139 +161,123 @@ msgid "Cache has been cleared"
 msgstr ""
 
 msgctxt "#30603"
-msgid "Show has no episodes"
+msgid "No results"
 msgstr ""
 
-msgctxt "#30604"
-msgid "Show has no movies"
-msgstr ""
 
-msgctxt "#30605"
-msgid "Show has no trailers"
-msgstr ""
-
-msgctxt "#30606"
-msgid "Show has no clips"
-msgstr ""
-
-# genre strings
-
+# genres 30700-30730
 msgctxt "#30700"
-msgid "Genres"
-msgstr ""
-
-msgctxt "#30701"
 msgid "Action"
 msgstr ""
 
-msgctxt "#30702"
+msgctxt "#30701"
 msgid "Adventure"
 msgstr ""
 
-msgctxt "#30703"
+msgctxt "#30702"
 msgid "Bishonen"
 msgstr ""
 
-msgctxt "#30704"
+msgctxt "#30703"
 msgid "Bishoujo"
 msgstr ""
 
-msgctxt "#30705"
+msgctxt "#30704"
 msgid "Comedy"
 msgstr ""
 
-msgctxt "#30706"
+msgctxt "#30705"
 msgid "Cyberpunk"
 msgstr ""
 
-msgctxt "#30707"
+msgctxt "#30706"
 msgid "Drama"
 msgstr ""
 
-msgctxt "#30708"
+msgctxt "#30707"
 msgid "Fan Service"
 msgstr ""
 
-msgctxt "#30709"
+msgctxt "#30708"
 msgid "Fantasy"
 msgstr ""
 
-msgctxt "#30710"
+msgctxt "#30709"
 msgid "Harem"
 msgstr ""
 
-msgctxt "#30711"
+msgctxt "#30710"
 msgid "Historical"
 msgstr ""
 
-msgctxt "#30712"
+msgctxt "#30711"
 msgid "Horror"
 msgstr ""
 
-msgctxt "#30713"
+msgctxt "#30712"
 msgid "Live Action"
 msgstr ""
 
-msgctxt "#30714"
+msgctxt "#30713"
 msgid "Magical Girl"
 msgstr ""
 
-msgctxt "#30715"
+msgctxt "#30714"
 msgid "Martial Arts"
 msgstr ""
 
-msgctxt "#30716"
+msgctxt "#30715"
 msgid "Mecha"
 msgstr ""
 
-msgctxt "#30717"
+msgctxt "#30716"
 msgid "Moe"
 msgstr ""
 
-msgctxt "#30718"
+msgctxt "#30717"
 msgid "Mystery"
 msgstr ""
 
-msgctxt "#30719"
+msgctxt "#30718"
 msgid "Reverse Harem"
 msgstr ""
 
-msgctxt "#30720"
+msgctxt "#30719"
 msgid "Romance"
 msgstr ""
 
-msgctxt "#30721"
+msgctxt "#30720"
 msgid "School"
 msgstr ""
 
-msgctxt "#30722"
+msgctxt "#30721"
 msgid "Sci Fi"
 msgstr ""
 
-msgctxt "#30723"
+msgctxt "#30722"
 msgid "Shonen"
 msgstr ""
 
-msgctxt "#30724"
+msgctxt "#30723"
 msgid "Slice of Life"
 msgstr ""
 
-msgctxt "#30725"
+msgctxt "#30724"
 msgid "Space"
 msgstr ""
 
-msgctxt "#30726"
+msgctxt "#30725"
 msgid "Sports"
 msgstr ""
 
-msgctxt "#30727"
+msgctxt "#30726"
 msgid "Super Power"
 msgstr ""
 
-msgctxt "#30728"
+msgctxt "#30727"
 msgid "Supernatural"
 msgstr ""
 
-msgctxt "#30729"
+msgctxt "#30728"
 msgid "Yuri"
 msgstr ""

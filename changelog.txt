@@ -1,3 +1,28 @@
+v1.0.0
+- Initial release
+
+v0.2.1
+- Changed error list item to be more generic
+
+v0.2.0
+- Fixed getting movies
+- Added setting streaming info
+- Cleaned up some code
+
+v0.1.2
+- Added caching
+- Made common plugin cache and optional import
+- Added option to disable caching
+
+v0.1.1
+- Rewrote almost everything
+- Removed model/controller classes
+
+v0.1.0
+- Rewrote api classes
+- Removed user model/controller
+- Cleaned up code
+
 v0.0.9
 - Added setting for adding shows to a black list
 - Added http_client param to user_controller
