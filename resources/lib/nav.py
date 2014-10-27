@@ -94,7 +94,7 @@ def add_video_list_item(query, item):
     li.setProperty('Is_playable', 'true')
     li.addStreamInfo('video', item.stream_info)
     li.setInfo('video', item.get('info'))
-    li.addContextMenuItems(gen_video_context_menu_items(query, item))
+    # li.addContextMenuItems(gen_video_context_menu_items(query, item))
     xbmcplugin.addDirectoryItem(handle, url, li, False, item.get('total', 0))
 
 
