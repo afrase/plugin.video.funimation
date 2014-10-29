@@ -1,3 +1,6 @@
+v1.0.1
+- Added check for addon userdata directory
+
 v1.0.0
 - Initial release
 
