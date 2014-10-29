@@ -3,7 +3,8 @@ import urllib
 import urllib2
 import cookielib
 from sys import modules
-from os.path import join
+from os.path import join, exists
+from os import makedirs
 
 
 class Core(object):
@@ -60,6 +61,8 @@ class Core(object):
     def _load_cookiejar(self):
         cookie_path = self.xbmc.translatePath(
             self.settings.getAddonInfo('profile'))
+        if not exists(cookie_path):
+            makedirs(cookie_path)
         cookie_path = join(cookie_path, 'fun-cookiejar.txt')
         cookiejar = cookielib.LWPCookieJar(cookie_path, delayload=True)
         self.log('Loading cookies from :' + repr(cookie_path),
