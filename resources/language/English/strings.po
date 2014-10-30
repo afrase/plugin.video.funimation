@@ -73,7 +73,7 @@ msgid "Enable Caching"
 msgstr ""
 
 msgctxt "#30204"
-msgid "Sub or Dub?"
+msgid "Only show Sub, Dub or Both?"
 msgstr ""
 
 msgctxt "#30205"
@@ -96,22 +96,6 @@ msgstr ""
 
 msgctxt "#30211"
 msgid "Log level"
-msgstr ""
-
-msgctxt "#30212"
-msgid "View mode"
-msgstr ""
-
-msgctxt "#30213"
-msgid "XBMC Default"
-msgstr ""
-
-msgctxt "#30214"
-msgid "Thumbnails Everywhere"
-msgstr ""
-
-msgctxt "#30215"
-msgid "Video Thumbnails"
 msgstr ""
 
 msgctxt "#30216"
