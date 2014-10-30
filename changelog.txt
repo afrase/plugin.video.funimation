@@ -1,3 +1,7 @@
+v1.0.2
+- Removed some unused strings
+- Removed 'optional="true"' from addon.xml because it does nothing
+
 v1.0.1
 - Added check for addon userdata directory
 
