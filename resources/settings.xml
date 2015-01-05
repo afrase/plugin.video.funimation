@@ -18,6 +18,7 @@
     <setting id="loglvl" type="enum" label="30211" lvalues="30219|30220|30221|30222|30223" default="0" />
     <setting type="sep" />
     <setting label="30218" type="action" action="RunScript($CWD/resources/lib/scripts/clear_cache.py)"/>
+    <setting id="subsciber" type="bool" default="false" visible="false" /> 
   </category>
 
 </settings>
