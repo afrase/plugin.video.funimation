@@ -30,6 +30,7 @@ class Api(Core):
     def __init__(self):
         super(Api, self).__init__()
         self.logged_in = False
+        self.subscribed = self.settings.getSetting('subsciber') == 'true'
         self.login()
 
     def get_data(self, endpoint, params):
@@ -68,9 +69,29 @@ class Api(Core):
                     self.common.show_error_message(match.group(1))
                     self.logged_in = False
             else:
+                self._check_subscriber(resp)
                 self.common.show_message(
                     'Successfully logged in as %s' % user, 'Login Successful')
                 self.logged_in = True
+        else:
+            self._check_subscriber()
+
+    def _check_subscriber(self, resp=None):
+        if resp is None:
+            self.settings.setSetting('subsciber', 'false')
+            self.subscribed = False
+        else:
+            try:
+                if resp['roles'].values()[0] == u'Subscriber':
+                    self.settings.setSetting('subsciber', 'true')
+                    self.subscribed = True
+                else:
+                    self.settings.setSetting('subsciber', 'false')
+                    self.subscribed = False
+            except:
+                self.settings.setSetting('subsciber', 'false')
+                self.subscribed = False
+
 
     def _get_data(self, url):
         try:
@@ -105,7 +126,7 @@ class Api(Core):
         # this is can be streaming or subscription but not sure how to
         # tell what to use yet. maybe if logged in it's subscription if
         # not it's streaming?
-        if self.logged_in:
+        if self.subscribed:
             v_type = 'subscription'
         else:
             v_type = 'streaming'

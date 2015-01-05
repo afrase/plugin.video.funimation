@@ -3,7 +3,7 @@ import xbmc
 import xbmcaddon
 
 addon = xbmcaddon.Addon('plugin.video.funimation')
-name = addon.getAddonInfo('name')
+name = addon.getAddonInfo('id')
 icon = addon.getAddonInfo('icon')
 
 duration = ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10][int(addon.getSetting('notification_length'))]) * 1000
