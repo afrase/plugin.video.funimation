@@ -1,3 +1,7 @@
+v1.0.3
+- Added a check to see if user is a subscriber
+- The clear cache option now properly clears the StorageServer cache
+
 v1.0.2
 - Removed some unused strings
 - Removed 'optional="true"' from addon.xml because it does nothing
