@@ -1,6 +1,7 @@
 import os
 from sys import modules, argv
 from .api import genre_types
+from .models import Show
 
 xbmcplugin = modules['__main__'].xbmcplugin
 xbmcgui = modules['__main__'].xbmcgui
@@ -13,13 +14,8 @@ _ = common.get_string
 
 # static menu items
 menus = (
-    {'label': _('shows'),      'path': '/show',            'folder': 'true', 'get': 'shows'},
-    {'label': _('genres'),     'path': '/genre',           'folder': 'true'},
-    {'label': _('search'),     'path': '/search',          'folder': 'true'},
-    {'label': _('episodes'),   'path': '/show/episodes',   'folder': 'true', 'get': 'episodes'},
-    {'label': _('movies'),     'path': '/show/movies',     'folder': 'true', 'get': 'movies'},
-    {'label': _('clips'),      'path': '/show/clips',      'folder': 'true', 'get': 'clips'},
-    {'label': _('trailers'),   'path': '/show/trailers',   'folder': 'true', 'get': 'trailers'},
+    {'label': _('shows'), 'path': '/show', 'folder': 'true', 'get': 'shows'},
+    {'label': 'Browse Latest', 'path': '/show', 'folder': 'true', 'get': 'latest'},
 )
 
 def list_menu():
@@ -89,7 +85,7 @@ def add_folder_list_item(query, item):
 
 def add_video_list_item(query, item):
     common.log('query: %s item: %s' % (repr(query), repr(item)), common.DEBUG)
-    url = api.stream_url(query.get('videoid'), item.quality)
+    url = item.get('video_url')
     li = gen_list_item(item)
     li.setProperty('Is_playable', 'true')
     li.addStreamInfo('video', item.stream_info)
@@ -111,6 +107,8 @@ def gen_video_context_menu_items(query, item):
 def gen_list_item(item):
     get = item.get
     li = xbmcgui.ListItem(get('label'), get('label2'), get('icon'), get('thumbnail'))
+    if get('info'):
+        li.setInfo('video', get('info'))
     return li
 
 

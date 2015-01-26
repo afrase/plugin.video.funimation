@@ -2,7 +2,6 @@ from sys import modules, argv
 from .core import Core
 
 
-order_types = ['asc', 'desc']
 rating_type = ['tvpg', 'tv14', 'tvma', 'nr', 'pg', 'pg13', 'r', 'all']
 sort_types = ['alpha', 'date', 'dvd', 'now', 'soon', 'votes', 'episode',
               'title', 'sequence']
@@ -14,14 +13,11 @@ genre_types = ['all', 'action', 'adventure', 'bishonen', 'bishoujo', 'comedy',
                'space', 'sports', 'super power', 'supernatural', 'yuri']
 
 urls = {
-    'details':  'mobile/node/{showid}',
-    'search':   'mobile/shows.json/alpha/asc/nl/all/all?keys={term}',
-    'shows':    'mobile/shows.json/{sort}/{order}/{limit}/{rating}/{genre}',
-    'clips':    'mobile/clips.json/sequence/{order}/{showid}/all/all?page={page}',
-    'trailers': 'mobile/trailers.json/sequence/{order}/{showid}/all/all?page={page}',
-    'movies':   'mobile/movies.json/{v_type}/{sort}/{order}/all/{showid}?page={page}',
-    'episodes': 'mobile/episodes.json/{v_type}/sequence/{order}/all/{showid}?page={page}',
-    'stream':   '{base_url}/038C48/SV/480/{video_id}/{video_id}-480-{quality}K.mp4.m3u8?{uid}',
+    'shows': 'feeds/ps/shows?ut={ut}&limit={limit}&offset={offset}',
+    'episodes': 'feeds/ps/videos?ut={ut}&show_id={show_id}&limit={limit}&offset={offset}',
+    'featured': 'feeds/ps/featured?{0}',
+    'login': 'feeds/ps/login.json',
+    'latest': 'feeds/ps/shows?ut={ut}&limit={limit}&offset={offset}&sort=SortOptionLatestSubscription',
 }
 
 
@@ -36,14 +32,8 @@ class Api(Core):
     def get_data(self, endpoint, params):
         params = self._check_params(**params)
         url = urls[endpoint].format(**params)
+        self.log('ENDPOINT: %s PARAMS: %s URL: %s' % (repr(endpoint), repr(params), url))
         return self._get_data(url)
-
-    def stream_url(self, video_id, quality):
-        base_url = 'http://wpc.8c48.edgecastcdn.net'
-        # this value doesn't seem to change
-        uid = '9b303b6c62204a9dcb5ce5f5c607'
-        url = urls['stream'].format(**locals())
-        return url
 
     def login(self):
         if self.cookie_expired:
@@ -55,26 +45,14 @@ class Api(Core):
         user = self.settings.getSetting('username')
         passwd = self.settings.getSetting('password')
         if user and passwd:
-            payload = {'username': user, 'password':
-                       passwd, 'sessionid': self._get_session()}
-            resp = self.post(
-                'phunware/user/login.json', payload, False)['user']
-            # this isn't a very good way to tell if the login was successful
-            if len(resp['session']) > 32:
-                match = re.match(r'^.*?\\"(.*)\\".*$', resp['session'])
-                if match is None:
-                    self.common.show_error_message('Unknown login error')
-                    self.logged_in = False
-                else:
-                    self.common.show_error_message(match.group(1))
-                    self.logged_in = False
-            else:
-                self._check_subscriber(resp)
-                self.common.show_message(
-                    'Successfully logged in as %s' % user, 'Login Successful')
+            payload = {'username': user, 'password': passwd, 'playstation_id': '',}
+            resp = self.post(urls['login'], payload, False)
+            if resp.get('user_type') == 'FUNIMATION_SUBSCRIPTION_USER':
                 self.logged_in = True
-        else:
-            self._check_subscriber()
+                self.common.show_message('Successfully logged in as %s' % user, 'Login Successful')
+            else:
+                self.logged_in = False
+                self.common.show_error_message('Unknown login error')
 
     def _check_subscriber(self, resp=None):
         if resp is None:
@@ -92,7 +70,6 @@ class Api(Core):
                 self.settings.setSetting('subsciber', 'false')
                 self.subscribed = False
 
-
     def _get_data(self, url):
         try:
             resp = self.get(url)
@@ -102,36 +79,78 @@ class Api(Core):
             self.log('ERROR: %s URL: %s ' % (e, self.base_url.format(url)))
             return []
 
-    def _check_params(self, showid=0, page=0, sort=None, order=None,
-                      limit=None, rating=None, genre=None, term=None, **kwargs):
-
-        if sort is None or sort not in sort_types:
-            sort = 'date'
-
-        if order is None or order not in order_types:
-            order = 'asc'
-
-        if limit is None or not limit.isdigit():
-            limit = 'nl'  # no limit
-
-        if rating is None or rating not in rating_type:
-            rating = 'all'
-
-        if genre is None or genre not in genre_types:
-            genre = 'all'
-
-        if term is None:
-            term = ''
-
-        # this is can be streaming or subscription but not sure how to
-        # tell what to use yet. maybe if logged in it's subscription if
-        # not it's streaming?
-        if self.subscribed:
-            v_type = 'subscription'
+    def _check_params(self, limit=1000, offset=0, show_id=None, **kwargs):
+        if self.logged_in:
+            ut = 'FunimationSubscriptionUser'
         else:
-            v_type = 'streaming'
-
+            ut = 'SomethingElse'
         return locals()
 
-    def _get_session(self):
-        return self.get('phunware/system/connect.json', False)['sessid']
+
+
+class PS3API(object):
+    base_url = 'https://www.funimation.com/{0}'
+
+    urls = {
+        'shows': 'feeds/ps/shows?{0}',
+        'episodes': 'feeds/ps/videos?{0}',
+        'featured': 'feeds/ps/featured?{0}',
+    }
+
+    def __init__(self, limit=1000):
+        super(PS3API, self).__init__()
+        self.limit = limit
+        cookie_handler = urllib2.HTTPCookieProcessor()
+        self.opener = urllib2.build_opener(cookie_handler)
+        self.open = self.opener.open
+
+    def get_data(self, endpoint, params):
+        return self.get_shows()
+
+    def _build_uri(self, endpoint, params=None):
+        url_params = {'ut': 'FunimationSubscriptionUser', 'limit': self.limit, 'offset': 0}
+        if params is not None:
+            url_params.update(params)
+        return self.urls[endpoint].format(urllib.urlencode(url_params))
+
+    def _request(self, uri, params=None):
+        url = self.base_url.format(uri)
+        if params is None:
+            content = self.open(url).read()
+        else:
+            content = self.open(url, json.dumps(params)).read()
+        return json.loads(content)
+
+    def login(self):
+        payload = {
+            'username': 'bitness64',
+            'password': 'v876fQCWFSgH4Hpe',
+            'playstation_id': '',
+        }
+        return self._request('/feeds/ps/login.json', payload)
+
+    def get_shows(self):
+        return self._request(self._build_uri('shows'))
+
+    def get_episodes(self, eid):
+        return self.get_data(self._build_uri('episodes', {'show_id': eid}))['videos']
+
+    def get_featured(self):
+        return self.get_data(self._build_uri('featured'))
+
+    def get_latest(self):
+        return self.get_data(self._build_uri('shows', {'sort': 'SortOptionLatestSubscription'}))
+
+    def get_simulcast(self):
+        return self.get_data(self._build_uri('shows', {'filter': 'FilterOptionSimulcast', 'sort': 'SortOptionLatestSubscription'}))
+
+
+if __name__ == '__main__':
+    api = PS3API()
+    print(api.login())
+    # show = api.get_shows()[86]
+    # print(show)
+    # print(api.get_featured()[0])
+    # print(api.get_latest()[0])
+    # print(api.get_simulcast()[0])
+    # print(api.get_episodes(show['asset_id'])[0])

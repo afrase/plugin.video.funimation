@@ -1,5 +1,5 @@
 from sys import modules, argv
-from time import strptime
+from time import strptime, time
 from datetime import datetime
 from urllib import urlencode
 from urlparse import parse_qsl
@@ -167,13 +167,11 @@ def convert_values(d):
             d[k] = int(v) if v is not None else 0
         elif k == 'episode_number':
             d[k] = int(float(v)) if v is not None else 0
-        elif k == 'post_date':
+        elif k == 'pubDate':
             try:
                 d[k] = datetime.strptime(v, '%m/%d/%Y')
             except TypeError:
                 d[k] = datetime(*(strptime(v, '%m/%d/%Y')[0:6]))
-        elif k == 'duration':
-            d[k] = to_minutes(v)
         elif k == 'all_terms' or k == 'term':
             d[k] = v.split(', ')
         elif k == 'similar_shows':
@@ -193,25 +191,15 @@ def convert_values(d):
 
 
 def process_response(data):
-    # collapse data into list of dicts
-    data = [i[i.keys()[0]] for i in data[data.keys()[0]]]
-    # fix dict key names
-    data = fix_keys(data)
+    if type(data) is dict:
+        data = data['videos']
     # fix up the values
     data = [convert_values(i) for i in data]
 
-    if data[0].has_key('group_title'):
-        return [EpisodeDetail(**i) for i in data]
-    elif data[0].has_key('maturity_rating'):
+    if data[0].has_key('series_name'):
         return [Show(**i) for i in data]
-    elif data[0].has_key('episode_number'):
+    elif data[0].has_key('tv_or_move'):
         return [Episode(**i) for i in data]
-    elif data[0].has_key('tv_key_art'):
-        return [Movie(**i) for i in data]
-    elif data[0].has_key('funimationid'):
-        return [Clip(**i) for i in data]
-    elif data[0].has_key('is_mature'):
-        return [Trailer(**i) for i in data]
     else:
         return data
 
@@ -235,3 +223,27 @@ def filter_response(data):
     else:
         # just in case
         return data
+
+
+from functools import wraps
+
+def timethis(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time()
+        r = func(*args, **kwargs)
+        end = time()
+        log('{0}.{1} : {2}'.format(func.__module__, func.__name__, end - start))
+        return r
+    return wrapper
+
+from contextlib import contextmanager
+
+@contextmanager
+def timeblock(label):
+    start = time()
+    try:
+        yield
+    finally:
+        end = time()
+        log('{0} : {1}'.format(label, end - start))

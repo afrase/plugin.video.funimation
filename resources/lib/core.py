@@ -5,7 +5,7 @@ import cookielib
 from sys import modules
 from os.path import join, exists
 from os import makedirs
-
+from .common import timethis
 
 class Core(object):
 
@@ -25,7 +25,7 @@ class Core(object):
 
         self.base_url = 'https://www.funimation.com/{0}'
         self.cookiejar = self._load_cookiejar()
-        self.cookie_expired = self._check_session_cookie()
+        self.cookie_expired = self._is_session_expired()
 
         cookie_handler = urllib2.HTTPCookieProcessor(self.cookiejar)
         self.opener = urllib2.build_opener(cookie_handler)
@@ -43,6 +43,7 @@ class Core(object):
         else:
             return self._request(endpoint, params)
 
+    @timethis
     def _request(self, endpoint, params=None):
         if endpoint.startswith('http'):
             url = endpoint
@@ -53,7 +54,7 @@ class Core(object):
         if params is None:
             content = self.open(url).read()
         else:
-            content = self.open(url, urllib.urlencode(params)).read()
+            content = self.open(url, json.dumps(params)).read()
 
         self.cookiejar.save()
         return json.loads(content)
@@ -65,8 +66,7 @@ class Core(object):
             makedirs(cookie_path)
         cookie_path = join(cookie_path, 'fun-cookiejar.txt')
         cookiejar = cookielib.LWPCookieJar(cookie_path, delayload=True)
-        self.log('Loading cookies from :' + repr(cookie_path),
-                 self.common.DEBUG)
+        self.log('Cookie file :' + repr(cookie_path), self.common.DEBUG)
         try:
             cookiejar.load()
         except IOError:
@@ -76,23 +76,10 @@ class Core(object):
 
         return cookiejar
 
-    def _check_session_cookie(self):
-        # make sure there are actually cookies
-        if self.cookiejar._cookies:
-            # get cookie that holds login session. if it has expired cookielib
-            # won't load it.
-            fun_cookie = self.cookiejar._cookies.get('www.funimation.com')
-            if fun_cookie is None:
-                return True
-
-            root_fun_cookie = fun_cookie.get('/')
-            if root_fun_cookie is None:
-                return True
-
-            cookie = root_fun_cookie.get('expand')
-            if cookie is None:
-                return True
-            else:
-                return False
-        else:
+    def _is_session_expired(self):
+        # cookielib wont load expired cookies
+        try:
+            self.cookiejar._cookies['www.funimation.com']['/']['ci_session']
+            return False
+        except:
             return True

@@ -24,6 +24,8 @@ if __name__ == '__main__':
 
     from resources.lib.api import Api
     api = Api()
+    # from resources.lib.ps3_api import PS3API
+    # api = PS3API()
 
     import resources.lib.nav as nav
     nav.list_menu()
