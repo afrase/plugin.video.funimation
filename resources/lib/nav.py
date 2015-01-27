@@ -1,6 +1,5 @@
 import os
 from sys import modules, argv
-from .api import genre_types
 from .models import Show
 
 xbmcplugin = modules['__main__'].xbmcplugin
@@ -16,6 +15,7 @@ _ = common.get_string
 menus = (
     {'label': _('shows'), 'path': '/show', 'folder': 'true', 'get': 'shows'},
     {'label': 'Browse Latest', 'path': '/show', 'folder': 'true', 'get': 'latest'},
+    {'label': 'Browse Simulcasts', 'path': '/show', 'folder': 'true', 'get': 'simulcast'},
 )
 
 def list_menu():
@@ -54,7 +54,7 @@ def list_menu():
 
 
 def display_grenres():
-    for genre in genre_types:
+
         q = {'label': _(genre), 'path': '/genre', 'folder': 'true',
              'get': 'shows', 'genre': genre}
         add_list_item(q)
@@ -89,19 +89,7 @@ def add_video_list_item(query, item):
     li = gen_list_item(item)
     li.setProperty('Is_playable', 'true')
     li.addStreamInfo('video', item.stream_info)
-    li.setInfo('video', item.get('info'))
-    # li.addContextMenuItems(gen_video_context_menu_items(query, item))
     xbmcplugin.addDirectoryItem(handle, url, li, False, item.get('total', 0))
-
-
-def gen_video_context_menu_items(query, item):
-    cmi = []
-    query['get'] = 'details'
-    # TODO: i don't really like this. i can't remember why I return 'id'
-    #       instead of showid. need to look into.
-    query['showid'] = query['id']
-    cmi.append(('Details', 'XBMC.RunPlugin(%s)' % common.build_url(query)))
-    return cmi
 
 
 def gen_list_item(item):
@@ -120,7 +108,6 @@ def generate_menu(query):
     elif get == 'movies':
         xbmcplugin.setContent(handle, 'movies')
     elif get == 'shows':
-        query['sort'] = 'alpha'
         xbmcplugin.setContent(handle, 'tvshows')
 
     resp = api.get_data(get, query)

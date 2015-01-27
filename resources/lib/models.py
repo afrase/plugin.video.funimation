@@ -39,9 +39,9 @@ class TemplateModel(object):
 
     @property
     def stream_info(self):
-        if self.quality == 4000:
+        if self.video_quality == 4000:
             w, h = 1920, 1080
-        elif self.quality == 3500:
+        elif self.video_quality == 3500:
             w, h = 1080, 720
         else:
             w, h = 640, 480
@@ -162,7 +162,6 @@ class Episode(TemplateModel):
         'show_id',
         'show_name',
         'simulcast',
-        'thumbnail',
         'thumbnail_url',
         'title',
         'tv_or_move',
@@ -179,9 +178,9 @@ class Episode(TemplateModel):
             lbl = '%s (%s)' % (self.title, self.dub_sub)
         return lbl
 
-    # @property
-    # def thumbnail(self):
-    #     return self.thumbnail_url
+    @property
+    def thumbnail(self):
+        return self.thumbnail_url
 
     @property
     def sub(self):
@@ -191,26 +190,28 @@ class Episode(TemplateModel):
     def dub(self):
         return self.dub_sub == 'dub'
 
-    # @property
-    # def quality(self):
-    #     count = self.video_quality.count('HD (720)')
-    #     if count >= 2:
-    #         return 4000
-    #     elif count == 1:
-    #         return 3500
-    #     else:
-    #         return 2000
-
     @property
     def info(self):
         video_info = {
             'duration': self.duration / 60,
             'episode': self.episode_number,
             'votes': self.votes,
+            'genre': self.genre,
+            'plot': self.description,
+            'aired': self.pubDate.strftime('%Y-%m-%d'),
             'tvshowtitle': self.show_title,
         }
 
         return video_info
+
+    @property
+    def video_quality(self):
+        if self.quality == 'HD (1080)':
+            return 4000
+        elif self.quality == 'HD (720)':
+            return 3500
+        else:
+            return 2000
 
     @property
     def query_string(self):

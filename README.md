@@ -26,27 +26,27 @@ All requests have to have the query param ut=`user_type` from the login results,
 ---
 Here are the query params and values that I have found so far.
 ####shows
-| Param        | Values                       |
-| ------------ | ---------------------------- |
-| ut           | FunimationSubscriptionUser   |
-| limit        | int                          |
-| offset       | int                          |
-| sort         | SortOptionLatestSubscription |
-| first-letter | a-z &#124; non-alpha         |
-| filter       | FilterOptionSimulcast        |
+| Param        | Values                                                   |
+| ------------ | ----------------------------                             |
+| ut           | FunimationSubscriptionUser &#124; FunimationUser         |
+| limit        | int                                                      |
+| offset       | int                                                      |
+| sort         | SortOptionLatestSubscription &#124; SortOptionLatestFree |
+| first-letter | [a-z] &#124; non-alpha                                   |
+| filter       | FilterOptionSimulcast                                    |
 
 ####Episodes
-| Param        | Values                       |
-| ------------ | ---------------------------- |
-| ut           | FunimationSubscriptionUser   |
-| limit        | int                          |
-| offset       | int                          |
-| show_id      | int                          |
+| Param        | Values                                           |
+| ------------ | ----------------------------                     |
+| ut           | FunimationSubscriptionUser &#124; FunimationUser |
+| limit        | int                                              |
+| offset       | int                                              |
+| show_id      | int                                              |
 
 ####Featured
-| Param        | Values                       |
-| ------------ | ---------------------------- |
-| ut           | FunimationSubscriptionUser   |
+| Param        | Values                                           |
+| ------------ | ----------------------------                     |
+| ut           | FunimationSubscriptionUser &#124; FunimationUser |
 
 ---
 ####Login
