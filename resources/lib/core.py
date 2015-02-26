@@ -29,6 +29,7 @@ class Core(object):
 
         cookie_handler = urllib2.HTTPCookieProcessor(self.cookiejar)
         self.opener = urllib2.build_opener(cookie_handler)
+        self.opener.addheaders = [('User-Agent', 'Sony-PS3')]
         self.open = self.opener.open
 
     def get(self, endpoint, cache=True):

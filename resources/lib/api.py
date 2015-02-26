@@ -17,7 +17,7 @@ class Api(Core):
     def __init__(self):
         super(Api, self).__init__()
         self.logged_in = False
-        self.subscribed = self.settings.getSetting('subsciber') == 'true'
+        self.subscribed = self.settings.getSetting('subscriber') == 'true'
         self.login()
 
     def get_data(self, endpoint, params):
@@ -38,28 +38,23 @@ class Api(Core):
         if user and passwd:
             payload = {'username': user, 'password': passwd, 'playstation_id': '',}
             resp = self.post(urls['login'], payload, False)
-            if resp.get('user_type') == 'FUNIMATION_SUBSCRIPTION_USER':
+            ut = resp.get('user_type')
+            if ut == 'FUNIMATION_SUBSCRIPTION_USER' or ut == 'FUNIMATION_USER':
                 self.logged_in = True
+                self._set_subscriber(ut == 'FUNIMATION_SUBSCRIPTION_USER')
                 self.common.show_message('Successfully logged in as %s' % user, 'Login Successful')
             else:
                 self.logged_in = False
+                self._set_subscriber(False)
                 self.common.show_error_message('Unknown login error')
 
-    def _check_subscriber(self, resp=None):
-        if resp is None:
-            self.settings.setSetting('subsciber', 'false')
-            self.subscribed = False
+    def _set_subscriber(self, is_sub):
+        if is_sub:
+            self.settings.setSetting('subscriber', 'true')
+            self.subscribed = True
         else:
-            try:
-                if resp['roles'].values()[0] == u'Subscriber':
-                    self.settings.setSetting('subsciber', 'true')
-                    self.subscribed = True
-                else:
-                    self.settings.setSetting('subsciber', 'false')
-                    self.subscribed = False
-            except:
-                self.settings.setSetting('subsciber', 'false')
-                self.subscribed = False
+            self.settings.setSetting('subscriber', 'false')
+            self.subscribed = False
 
     def _get_data(self, url):
         try:
@@ -71,8 +66,8 @@ class Api(Core):
             return []
 
     def _check_params(self, limit=1000, offset=0, show_id=None, **kwargs):
-        if self.logged_in:
-            ut = 'FunimationSubscriptionUser'
+        if self.subscribed:
+            ut = 'FunimationSubsctiptionUser'
             sort = 'SortOptionLatestSubscription'
         else:
             ut = 'FunimationUser'
