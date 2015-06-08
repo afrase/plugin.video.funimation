@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import xbmcgui
 import xbmcplugin
 from sys import modules, argv

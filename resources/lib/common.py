@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from sys import modules, argv
 from urllib import urlencode
 from urlparse import parse_qsl

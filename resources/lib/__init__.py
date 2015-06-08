@@ -1,1 +1,1 @@
-from .funimation import Funimation
+# -*- coding: utf-8 -*-

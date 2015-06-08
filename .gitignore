@@ -131,3 +131,4 @@ sftp-config.json
 
 upload.sh
 .python-version
+xbmc-mocks/
