@@ -17,6 +17,7 @@ STRINGMAP = {
     'browse_genre': 30014,
     'browse_alpha': 30015,
     'search': 30016,
+    'queue': 30017,
 
     # messages
     'error':            30600,

@@ -15,7 +15,7 @@ def setup_logging():
     formatter = logging.Formatter(
         '[{0}] %(funcName)s : %(message)s'.format(addon.getAddonInfo('id')))
     kh = KodiHandler()
-    kh.setLevel(logging.DEBUG)
+    kh.setLevel(logging.INFO)
     kh.setFormatter(formatter)
     logger.addHandler(kh)
     return logger
@@ -23,7 +23,7 @@ def setup_logging():
 
 def main():
     log = setup_logging()
-    log.debug('ARGV: ' + repr(sys.argv))
+    log.info('ARGV: ' + repr(sys.argv))
 
     import resources.lib.nav as nav
     nav.list_menu()

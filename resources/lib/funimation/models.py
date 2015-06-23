@@ -10,6 +10,9 @@ class Structure(object):
     def get(self, key, default=None):
         return getattr(self, key, default)
 
+    def to_dict(self):
+        return self.__dict__
+
     @property
     def label(self):
         raise NotImplementedError
@@ -67,6 +70,14 @@ class Show(Structure):
     @property
     def query(self):
         return {'show_id': self.asset_id, 'get': 'videos'}
+
+    @property
+    def query_queue_add(self):
+        return 'show_id={0}&get=queue&action=add'.format(self.asset_id)
+
+    @property
+    def query_queue_remove(self):
+        return 'show_id={0}&get=queue&action=remove'.format(self.asset_id)
 
     @property
     def genre(self):

@@ -8,16 +8,21 @@ import xbmcplugin
 import xbmcaddon
 
 import utils
-from .funimation import Funimation
+from .funimation import Funimation, WatchQueue
+from .funimation.models import Show
 
 log = logging.getLogger('funimation')
 handle = int(sys.argv[1])
 addon = xbmcaddon.Addon()
 
-cookie_file = os.path.join(
-        xbmc.translatePath(addon.getAddonInfo('profile')), 'fun-cookie.txt')
+cookie_file = os.path.join(xbmc.translatePath(addon.getAddonInfo('profile')),
+                           'fun-cookie.txt')
 api = Funimation(addon.getSetting('username'), addon.getSetting('password'),
                  cookie_file)
+
+queue_db = os.path.join(xbmc.translatePath(addon.getAddonInfo('profile')),
+                        'queue.db')
+queue = WatchQueue(queue_db)
 
 _ = utils.get_string
 # static menu items
@@ -29,6 +34,7 @@ menus = (
     {'label': _('browse_genre'),      'get': 'genres'},
     {'label': _('browse_alpha'),      'get': 'alpha'},
     {'label': _('search'),            'get': 'search'},
+    {'label': _('queue'),             'get': 'queue'},
 )
 
 
@@ -78,6 +84,14 @@ def generate_menu(query):
             add_list_item({'label': i, 'get': 'shows', 'alpha': i})
         add_list_item({'label': '#', 'get': 'shows', 'alpha': 'non-alpha'})
 
+    elif action == 'queue':
+        if query.get('action') == 'add':
+            queue.add_show(api.get_show(query.get('show_id')))
+        elif query.get('action') == 'remove':
+            queue.remove_show(query.get('show_id'))
+        else:
+            add_shows(queue.shows)
+
 
 def add_videos(results):
     # 0=both, 1=sub, 2=dub
@@ -98,7 +112,7 @@ def add_shows(results):
         for show in results:
             add_list_item(show.query, show, total)
     else:
-        add_list_item(_('no_results'))
+        add_list_item({'label': _('no_results')})
 
 
 def add_list_item(query, item=None, total=0):
@@ -114,6 +128,12 @@ def add_list_item(query, item=None, total=0):
     else:
         is_folder = True
         url = utils.build_url(query)
+
+    if isinstance(item, Show):
+        if 'queue' in utils.get_params().values():
+            add_context_menu(li, 'Remove from Queue', item.query_queue_remove)
+        else:
+            add_context_menu(li, 'Add to Queue', item.query_queue_add)
     xbmcplugin.addDirectoryItem(handle, url, li, is_folder, total)
 
 
@@ -124,3 +144,8 @@ def new_list_item(item):
         li.setInfo('video', item.get('info'))
 
     return li
+
+def add_context_menu(li, label, query):
+    item = (label,
+        'RunScript({0},-1,?{1})'.format(addon.getAddonInfo('id'), query))
+    li.addContextMenuItems([item])

@@ -29,6 +29,13 @@ class Funimation(object):
         query = self._build_query(locals())
         return self._request('feeds/ps/shows', query)
 
+    def get_show(self, show_id):
+        shows = self.get_shows()
+        for show in shows:
+            if show_id == show.asset_id:
+                return show
+        return None
+
     def get_videos(self, show_id, limit=1000, offset=0):
         query = self._build_query(locals())
         return self._request('feeds/ps/videos', query)

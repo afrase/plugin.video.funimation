@@ -46,6 +46,10 @@ msgctxt "#30016"
 msgid "Search"
 msgstr ""
 
+msgctxt "#30017"
+msgid "Queue"
+msgstr ""
+
 
 # general settings 30200-30205
 msgctxt "#30200"
