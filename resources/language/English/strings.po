@@ -60,6 +60,22 @@ msgctxt "#30202"
 msgid "Password"
 msgstr ""
 
+msgctxt "#30203"
+msgid "Only show Sub, Dub or Both?"
+msgstr ""
+
+msgctxt "#30204"
+msgid "Both"
+msgstr ""
+
+msgctxt "#30205"
+msgid "Sub"
+msgstr ""
+
+msgctxt "#30206"
+msgid "Dub"
+msgstr ""
+
 # advanced settings 30210-30220
 msgctxt "#30210"
 msgid "Advanced"

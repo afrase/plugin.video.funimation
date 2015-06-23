@@ -1,16 +1,25 @@
 # -*- coding: utf-8 -*-
+import os
+import sys
+import logging
+import xbmc
 import xbmcgui
 import xbmcplugin
-from sys import modules, argv
+import xbmcaddon
 
-from .models import Show, Video
+import utils
+from .funimation import Funimation
 
-common = modules['__main__'].common
-api = modules['__main__'].api
-handle = int(argv[1])
+log = logging.getLogger('funimation')
+handle = int(sys.argv[1])
+addon = xbmcaddon.Addon()
 
-_ = common.get_string
+cookie_file = os.path.join(
+        xbmc.translatePath(addon.getAddonInfo('profile')), 'fun-cookie.txt')
+api = Funimation(addon.getSetting('username'), addon.getSetting('password'),
+                 cookie_file)
 
+_ = utils.get_string
 # static menu items
 menus = (
     {'label': _('browse_shows'),      'get': 'shows'},
@@ -24,7 +33,7 @@ menus = (
 
 
 def list_menu():
-    params = common.get_params()
+    params = utils.get_params()
     if params.get('get'):
         generate_menu(params)
     else:
@@ -35,7 +44,7 @@ def list_menu():
 
 
 def generate_menu(query):
-    action = query['get']
+    action = query.get('get')
     if action == 'shows':
         xbmcplugin.setContent(handle, 'tvshows')
         if query.get('_filter') == 'genre':
@@ -56,7 +65,7 @@ def generate_menu(query):
         add_videos(results)
 
     elif action == 'search':
-        results = api.search(common.get_user_input('Search'))
+        results = api.search(utils.get_user_input('Search'))
         add_shows(results)
         add_videos(results)
 
@@ -71,22 +80,22 @@ def generate_menu(query):
 
 
 def add_videos(results):
-    if results.get('episodes'):
-        results = results.get('episodes')
-    if results.get('videos') is not None:
-        total = len(results.get('videos'))
-        for item in results.get('videos'):
-            video = Video(**item)
+    # 0=both, 1=sub, 2=dub
+    sub_dub = int(addon.getSetting('sub_dub'))
+    total = len(results)
+    for video in results:
+        if sub_dub == 1 and video.sub:
+            add_list_item(video.query, video, total)
+        elif sub_dub == 2 and video.dub:
+            add_list_item(video.query, video, total)
+        elif sub_dub == 0:
             add_list_item(video.query, video, total)
 
 
 def add_shows(results):
-    if isinstance(results, dict):
-        results = results.get('shows')
-    if results is not None:
+    if results:
         total = len(results)
-        for item in results:
-            show = Show(**item)
+        for show in results:
             add_list_item(show.query, show, total)
     else:
         add_list_item(_('no_results'))
@@ -97,22 +106,21 @@ def add_list_item(query, item=None, total=0):
         item = query
 
     li = new_list_item(item)
-    is_folder = True
     if item.get('video_url'):
         url = item.get('video_url')
         is_folder = False
         li.setProperty('Is_playable', 'true')
-        li.addStreamInfo('video', item.stream_info)
+        li.addStreamInfo('video', item.get('stream_info'))
     else:
-        url = common.build_url(query)
+        is_folder = True
+        url = utils.build_url(query)
     xbmcplugin.addDirectoryItem(handle, url, li, is_folder, total)
 
 
 def new_list_item(item):
-    get = item.get
-    li = xbmcgui.ListItem(get('label'), get('label2'), get('icon'),
-                          get('thumbnail'))
-    if get('info'):
-        li.setInfo('video', get('info'))
+    li = xbmcgui.ListItem(item.get('label'), item.get('label2'),
+                          item.get('icon'), item.get('thumbnail'))
+    if item.get('info'):
+        li.setInfo('video', item.get('info'))
 
     return li

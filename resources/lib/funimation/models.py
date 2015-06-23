@@ -10,8 +10,15 @@ class Structure(object):
     def get(self, key, default=None):
         return getattr(self, key, default)
 
+    @property
+    def label(self):
+        raise NotImplementedError
+
+    def __len__(self):
+        return len(self._fields)
+
     def __repr__(self):
-        return repr(self.__dict__)
+        return '<{0}: {1}>'.format(self.__class__.__name__, self.label)
 
 
 # noinspection PyUnresolvedReferences
@@ -97,11 +104,11 @@ class Video(Structure):
 
     @property
     def sub(self):
-        return self.dub_sub == 'Sub'
+        return self.dub_sub == 'sub'
 
     @property
     def dub(self):
-        return self.dub_sub == 'Dub'
+        return self.dub_sub == 'dub'
 
     @property
     def label2(self):

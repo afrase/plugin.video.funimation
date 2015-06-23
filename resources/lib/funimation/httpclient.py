@@ -2,10 +2,12 @@
 import os
 import json
 import urllib2
+import logging
 import cookielib
 from urllib import urlencode
 
 __all__ = ['HTTPClient']
+_logger = logging.getLogger('funimation')
 
 
 class HTTPClient(object):
@@ -18,13 +20,16 @@ class HTTPClient(object):
 
         try:
             if self.cookiefile is not None:
+                # make sure the cookie files directory exists
                 if not os.path.exists(os.path.dirname(self.cookiefile)):
                     os.makedirs(os.path.dirname(self.cookiefile))
                 else:
                     self._cookiejar.load()
         except IOError:
-            # files doesn't exist yet
-            pass
+            # files doesn't exist yet. this is normal if the cookie was
+            # cleared or it's the first time running.
+            _logger.debug(
+                'cookie file "{0}" does not exist.'.format(self.cookiefile))
 
         cookie_handler = urllib2.HTTPCookieProcessor(self._cookiejar)
         self.opener = urllib2.build_opener(cookie_handler)
@@ -75,5 +80,5 @@ class HTTPClient(object):
                 req = urllib2.Request(url, data)
         else:
             req = urllib2.Request(url)
-
+        _logger.debug(req.get_full_url())
         return req
