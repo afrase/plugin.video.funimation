@@ -1,22 +1,33 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import logging
 import xbmc
 import xbmcaddon
+from resources.lib.kodi_handler import KodiHandler
 
 addon = xbmcaddon.Addon()
 
-if __name__ == '__main__':
-    import resources.lib.common as common
-    common.log('ARGV: ' + repr(sys.argv), common.DEBUG)
 
-    cookie_file = os.path.join(
-        xbmc.translatePath(addon.getAddonInfo('profile')), 'fun-cookie.txt')
+def setup_logging():
+    logger = logging.getLogger('funimation')
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        '[{0}] %(funcName)s : %(message)s'.format(addon.getAddonInfo('id')))
+    kh = KodiHandler()
+    kh.setLevel(logging.DEBUG)
+    kh.setFormatter(formatter)
+    logger.addHandler(kh)
+    return logger
 
-    from resources import Funimation
-    api = Funimation(addon.getSetting('username'),
-                     addon.getSetting('password'),
-                     cookie_file)
+
+def main():
+    log = setup_logging()
+    log.debug('ARGV: ' + repr(sys.argv))
 
     import resources.lib.nav as nav
     nav.list_menu()
+
+
+if __name__ == '__main__':
+    main()
