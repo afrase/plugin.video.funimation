@@ -49,10 +49,10 @@ def get_string(string_key):
     if string_key in STRINGMAP:
         string_id = STRINGMAP[string_key]
         string = xbmcaddon.Addon().getLocalizedString(string_id).encode('utf8')
-        _log.debug('"{0}" translates to "{1}"'.format(string_id, string))
+        _log.debug('"%s" translates to "%s"', string_id, string)
         return string
     else:
-        _log.debug('String is missing: "{0}"'.format(string_key))
+        _log.debug('String is missing: "%s"', string_key)
         return string_key
 
 

@@ -7,7 +7,6 @@ from .httpclient import HTTPClient
 from .models import Video, Show
 
 __all__ = ['Funimation']
-_logger = logging.getLogger('funimation')
 
 
 class Funimation(object):
@@ -16,12 +15,12 @@ class Funimation(object):
         super(Funimation, self).__init__()
         self.http = HTTPClient('https://www.funimation.com/', cookiefile,
                                [('User-Agent', 'Sony-PS3')])
+        self._log = logging.getLogger('funimation')
         # defaults to the free account user
         # hmm... the API doesn't appear to validate the users subscription
         # level so if this was changed you might be able to watch
         # the paid videos ;)
-        # self.user_type = 'FunimationUser'
-        self.user_type = 'FunimationSubscriptionUser'
+        self.user_type = 'FunimationUser'
         self.logged_in = self.login(username, password)
 
     def get_shows(self, limit=1000, offset=0, sort=None, first_letter=None,
@@ -53,7 +52,7 @@ class Funimation(object):
 
     def get_genres(self):
         # we have to loop over all the shows to be sure to get all the genres.
-        # use a set so duplicates are ignored.
+        # use a 'set' so duplicates are ignored.
         genres = set()
         for show in self.get_shows():
             if show.get('genres'):
@@ -73,7 +72,7 @@ class Funimation(object):
         # Unfortunetly we wont know if the users subscription status has
         # changed since we are reusing the cookie from previous requests.
         if not username and not password:
-            _logger.warning('No login credentials, using free account')
+            self._log.warning('No login credentials, using free account')
             return False
         # Cookie will be done if it doesn't exist or it has expired.
         cookie = self.http.get_cookie('ci_session')
@@ -102,19 +101,30 @@ class Funimation(object):
             self.http.get_cookie('ci_session').comment = '%s|%s' % (
                 username, self.user_type)
             self.http.save_cookies()
-            _logger.info('Logged in as "{0}"'.format(username))
+            _logger.info('Logged in as "%s"', username)
             return True
         except HTTPError:
-            _logger.warning('Login failed for "{0}"'.format(username))
+            _logger.warning('Login failed for "%s"', username)
             # throws a 400 error when login is wrong
             return False
 
     def _request(self, uri, query):
         res = self.http.get(uri, query)
         if 'videos' in res:
-            return [Video(**v) for v in res.get('videos')]
-        else:
+            return [Video(**v) for v in res['videos']]
+        elif isinstance(res, list) and 'series_name' in res[0]:
             return [Show(**s) for s in res]
+        else:
+            # search results
+            new_res = set()
+            if 'episodes' in res:
+                ep = res['episodes']
+                if isinstance(ep, dict):
+                    [new_res.add(Video(**v)) for v in ep['videos']]
+            if 'shows' in res:
+                [new_res.add(Show(**s)) for s in res['shows']]
+            self._log.debug(new_res)
+            return new_res
 
     def _build_query(self, params):
         if params is None:

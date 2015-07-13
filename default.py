@@ -10,12 +10,13 @@ addon = xbmcaddon.Addon()
 
 
 def setup_logging():
+    log_level = (int(addon.getSetting('loglvl')) + 1) * 10
     logger = logging.getLogger('funimation')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(log_level)
     formatter = logging.Formatter(
         '[{0}] %(funcName)s : %(message)s'.format(addon.getAddonInfo('id')))
     kh = KodiHandler()
-    kh.setLevel(logging.DEBUG)
+    kh.setLevel(log_level)
     kh.setFormatter(formatter)
     logger.addHandler(kh)
     return logger
@@ -23,7 +24,7 @@ def setup_logging():
 
 def main():
     log = setup_logging()
-    log.debug('ARGV: ' + repr(sys.argv))
+    log.debug('ARGV: %s', sys.argv)
 
     import resources.lib.nav as nav
     nav.list_menu()

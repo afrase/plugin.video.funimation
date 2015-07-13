@@ -14,6 +14,12 @@ class Structure(object):
     def label(self):
         raise NotImplementedError
 
+    def __eq__(self, other):
+        return self.asset_id == asset_id
+
+    def __hash__(self):
+        return hash(self.asset_id)
+
     def __len__(self):
         return len(self._fields)
 

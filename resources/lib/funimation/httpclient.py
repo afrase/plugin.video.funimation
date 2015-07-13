@@ -7,13 +7,13 @@ import cookielib
 from urllib import urlencode
 
 __all__ = ['HTTPClient']
-_logger = logging.getLogger('funimation')
 
 
 class HTTPClient(object):
 
     def __init__(self, base_url='', cookiefile=None, headers=None):
         super(HTTPClient, self).__init__()
+        self._log = logging.getLogger('funimation')
         self.base_url = base_url
         self.cookiefile = cookiefile
         self._cookiejar = cookielib.LWPCookieJar(self.cookiefile)
@@ -28,8 +28,8 @@ class HTTPClient(object):
         except IOError:
             # files doesn't exist yet. this is normal if the cookie was
             # cleared or it's the first time running.
-            _logger.debug(
-                'cookie file "{0}" does not exist.'.format(self.cookiefile))
+            self._log.debug('cookie file "%s" does not exist.',
+                            self.cookiefile)
 
         cookie_handler = urllib2.HTTPCookieProcessor(self._cookiejar)
         self.opener = urllib2.build_opener(cookie_handler)
@@ -56,6 +56,7 @@ class HTTPClient(object):
         return None
 
     def save_cookies(self):
+        self._log.debug('Saving cookie')
         self._cookiejar.save()
 
     def _request(self, request):
@@ -80,5 +81,5 @@ class HTTPClient(object):
                 req = urllib2.Request(url, data)
         else:
             req = urllib2.Request(url)
-        _logger.debug(req.get_full_url())
+        self._log.debug(req.get_full_url())
         return req

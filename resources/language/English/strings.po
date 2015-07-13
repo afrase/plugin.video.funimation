@@ -90,23 +90,19 @@ msgid "Clear Cookies"
 msgstr ""
 
 msgctxt "#30219"
-msgid "Errors"
+msgid "Error"
 msgstr ""
 
 msgctxt "#30220"
-msgid "Warnings"
+msgid "Warn"
 msgstr ""
 
 msgctxt "#30221"
-msgid "informational"
+msgid "Info"
 msgstr ""
 
 msgctxt "#30222"
-msgid "Debugging"
-msgstr ""
-
-msgctxt "#30223"
-msgid "Tracing"
+msgid "Debug"
 msgstr ""
 
 

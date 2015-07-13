@@ -65,9 +65,12 @@ def generate_menu(query):
         add_videos(results)
 
     elif action == 'search':
-        results = api.search(utils.get_user_input('Search'))
-        add_shows(results)
-        add_videos(results)
+        keyword = utils.get_user_input('Search')
+        if keyword:
+            results = api.search(keyword)
+            add_videos(results)
+        else:
+            add_list_item({'label': _('no_results')})
 
     elif action == 'genres':
         for genre in api.get_genres():
@@ -98,13 +101,13 @@ def add_shows(results):
         for show in results:
             add_list_item(show.query, show, total)
     else:
-        add_list_item(_('no_results'))
+        add_list_item({'label': _('no_results')})
 
 
 def add_list_item(query, item=None, total=0):
     if item is None:
         item = query
-
+    log.debug('query: %s item: %s', query, item)
     li = new_list_item(item)
     if item.get('video_url'):
         url = item.get('video_url')
