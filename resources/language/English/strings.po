@@ -76,6 +76,10 @@ msgctxt "#30206"
 msgid "Dub"
 msgstr ""
 
+msgctxt "#30207"
+msgid "Always use highest quality?"
+msgstr ""
+
 # advanced settings 30210-30220
 msgctxt "#30210"
 msgid "Advanced"

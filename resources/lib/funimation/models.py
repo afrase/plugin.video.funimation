@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from urlparse import urlparse
+
+
 class Structure(object):
     _fields = []
 
@@ -87,17 +90,18 @@ class Show(Structure):
 class Video(Structure):
     _fields = [
         'asset_id',
-        'releaseDate',
-        'title',
-        'video_url',
-        'quality',
         'description',
-        'number',
+        'dub_sub',
         'duration',
-        'thumbnail_url',
+        'funimation_id',
+        'number',
+        'quality',
         'rating',
         'releaseDate',
-        'dub_sub',
+        'releaseDate',
+        'thumbnail_url',
+        'title',
+        'video_url',
     ]
 
     @property
@@ -154,6 +158,21 @@ class Video(Structure):
             'height': h,
             'duration': self.duration
         }
+
+    @property
+    def high_quality_stream(self):
+        try:
+            url = urlparse(self.video_url)
+            # stream qualities are split by ','
+            path_split = url.path.split(',')
+            # the last value is the highest
+            highest = [q for q in path_split if q.isdigit()][-1]
+            # join the path with only the highest quality remaining
+            path = path_split[0] + highest + path_split[-1]
+            # recreate the URL
+            return '%s://%s%s?%s' % (url.scheme, url.netloc, path, url.query)
+        except:
+            return self.video_url
 
     @property
     def query(self):
