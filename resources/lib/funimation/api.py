@@ -13,7 +13,7 @@ class Funimation(object):
 
     def __init__(self, username=None, password=None, cookiefile=None):
         super(Funimation, self).__init__()
-        self.http = HTTPClient('https://www.funimation.com/', cookiefile,
+        self.http = HTTPClient('http://www.funimation.com/', cookiefile,
                                [('User-Agent', 'Sony-PS3')])
         self._log = logging.getLogger('funimation')
         # defaults to the free account user
@@ -92,7 +92,8 @@ class Funimation(object):
         payload = {'username': username, 'password': password,
                    'playstation_id': ''}
         try:
-            resp = self.http.post('feeds/ps/login.json?v=2', payload)
+            resp = self.http.post(
+                'https://www.funimation.com/feeds/ps/login.json?v=2', payload)
             utype = resp.get('user_type')
             if utype is not None:
                 # Convert snake case to camel case.

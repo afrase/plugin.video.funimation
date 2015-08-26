@@ -72,7 +72,8 @@ class HTTPClient(object):
         return content
 
     def _build_request(self, url, data=None):
-        url = self.base_url + url
+        if not url.startswith('http'):
+            url = self.base_url + url
         if data is not None:
             if isinstance(data, dict):
                 req = urllib2.Request(url, json.dumps(data),
