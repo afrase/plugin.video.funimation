@@ -19,6 +19,6 @@ class KodiHandler(Handler):
     def emit(self, record):
         try:
             msg = self.format(record)
-            xbmc.log(msg.decode('utf8'), py_to_kodi[record.levelno])
+            xbmc.log(msg, py_to_kodi[record.levelno])
         except:
             self.handleError(record)
