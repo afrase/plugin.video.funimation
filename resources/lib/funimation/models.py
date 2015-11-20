@@ -18,7 +18,7 @@ class Structure(object):
         raise NotImplementedError
 
     def __eq__(self, other):
-        return self.asset_id == asset_id
+        return self.asset_id == other
 
     def __hash__(self):
         return hash(self.asset_id)
@@ -160,20 +160,36 @@ class Video(Structure):
         }
 
     @property
-    def high_quality_stream(self):
+    def query(self):
+        return {'videoid': self.asset_id}
+
+    def get_video_url(self, quality):
+        # 0 = 480, 1 = 720, 2 = 1080
+        # This is a bit hacky but I can't really think of a good way to do it
+        # with the current information the API returns.
+        # Every video has one of these bit rates
+        # 750,1500                  SD
+        # 750,1500,2000,2500        HD720
+        # 750,1500,2000,2500,4000   HD1080
         try:
             url = urlparse(self.video_url)
             # stream qualities are split by ','
             path_split = url.path.split(',')
-            # the last value is the highest
-            highest = [q for q in path_split if q.isdigit()][-1]
-            # join the path with only the highest quality remaining
-            path = path_split[0] + highest + path_split[-1]
+            # sort it just to make sure it's in the correct order
+            rates = sorted([int(q) for q in path_split if q.isdigit()])
+            if quality == 2:
+                # just get the highest quality
+                rate = rates[-1]
+            elif quality == 1:
+                # 1080p videos always have 5 different rates
+                if len(rates) == 5:  # HD1080
+                    rate = rates[-2]
+                else:
+                    rate = rates[-1]
+            else:
+                rate = rates[0]
+            path = path_split[0] + str(rate) + path_split[-1]
             # recreate the URL
             return '%s://%s%s?%s' % (url.scheme, url.netloc, path, url.query)
         except:
             return self.video_url
-
-    @property
-    def query(self):
-        return {'videoid': self.asset_id}

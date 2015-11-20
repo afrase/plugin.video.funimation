@@ -56,7 +56,7 @@ class HTTPClient(object):
         return None
 
     def save_cookies(self):
-        self._log.debug('Saving cookie')
+        self._log.debug('Saving cookie to "%s"', self._cookiejar.filename)
         self._cookiejar.save()
 
     def _request(self, request):
@@ -82,5 +82,5 @@ class HTTPClient(object):
                 req = urllib2.Request(url, data)
         else:
             req = urllib2.Request(url)
-        self._log.debug(req.get_full_url())
+        self._log.info(req.get_full_url())
         return req

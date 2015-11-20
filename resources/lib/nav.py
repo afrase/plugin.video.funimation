@@ -110,11 +110,8 @@ def add_list_item(query, item=None, total=0):
     log.debug('query: %s item: %s', query, item)
     li = new_list_item(item)
     if item.get('video_url'):
-        if addon.getSetting('high_quality') == '1':
-            url = item.high_quality_stream
-        else:
-            url = item.get('video_url')
-        log.debug('video_url: %s', url)
+        url = item.get_video_url(int(addon.getSetting('video_quality')))
+        log.info('video_url: %s', url)
         is_folder = False
         li.setProperty('Is_playable', 'true')
         li.addStreamInfo('video', item.get('stream_info'))
