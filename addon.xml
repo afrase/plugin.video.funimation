@@ -7,6 +7,8 @@
     <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
+    <license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
+    <forum>http://forum.kodi.tv/showthread.php?tid=192693</forum>
     <website>http://www.funimation.com</website>
     <source>https://github.com/Sinap/plugin.video.funimation</source>
     <email>afrase91@gmail.com</email>
