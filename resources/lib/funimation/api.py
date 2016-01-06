@@ -118,13 +118,14 @@ class Funimation(object):
             return [Show(**s) for s in res]
         else:
             # search results
-            new_res = set()
-            if 'episodes' in res:
-                ep = res['episodes']
-                if isinstance(ep, dict):
-                    [new_res.add(Video(**v)) for v in ep['videos']]
-            if 'shows' in res:
-                [new_res.add(Show(**s)) for s in res['shows']]
+            new_res = {}
+            # the result is a list when there is no episodes in the results...
+            if isinstance(res['episodes'], list):
+                new_res['episodes'] = []
+            else:
+                new_res['episodes'] = [Video(**v) for v in
+                                       res['episodes']['videos']]
+            new_res['shows'] = [Show(**s) for s in res['shows']]
             self._log.debug(new_res)
             return new_res
 
