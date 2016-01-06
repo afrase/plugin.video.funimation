@@ -68,7 +68,10 @@ def generate_menu(query):
         keyword = utils.get_user_input('Search')
         if keyword:
             results = api.search(keyword)
-            add_videos(results)
+            if results['shows']:
+                add_shows(results['shows'])
+            if results['episodes']:
+                add_videos(results['episodes'])
         else:
             add_list_item({'label': _('no_results')})
 
